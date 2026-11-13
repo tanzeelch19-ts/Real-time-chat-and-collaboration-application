@@ -21,6 +21,23 @@ export function createApp() {
   loadDb();
 
   const app = express();
+  // Cross-origin access for a frontend hosted elsewhere (for example Vercel).
+  // Only origins listed in CORS_ORIGIN (comma-separated) are allowed.
+  const allowedOrigins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,PUT,DELETE,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+      res.setHeader('Vary', 'Origin');
+    }
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    next();
+  });
   app.use(express.json({ limit: '100kb' }));
 
   // Save after every change, so accounts, workspaces, and messages survive restarts.

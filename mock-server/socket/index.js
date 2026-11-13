@@ -36,7 +36,14 @@ const displayNameOf = (userId) => db.users.find((u) => u.id === userId)?.display
  *   conversation:created (conversation)            one user
  */
 export function attachRealtime(httpServer) {
-  const io = new Server(httpServer, { path: '/socket.io' });
+  const socketOrigins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  const io = new Server(httpServer, {
+    path: '/socket.io',
+    cors: { origin: socketOrigins.length ? socketOrigins : false },
+  });
   setIo(io);
   startAwaySweep(io);
 
