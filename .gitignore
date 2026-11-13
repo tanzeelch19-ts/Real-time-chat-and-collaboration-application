@@ -1,0 +1,9 @@
+node_modules
+dist
+*.log
+mock-server/data/db.json
+mock-server/data/uploads/
+test-upload.txt
+downloaded.txt
+.env
+!.env.example
