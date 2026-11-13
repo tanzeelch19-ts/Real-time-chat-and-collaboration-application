@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-/** Accepts an empty string (meaning "no avatar") or an http(s) URL. */
-const isOptionalHttpUrl = (value) => {
-  if (value === '') return true;
+/** Accepts '' (no avatar), an uploaded image data URL, or an http(s) link. */
+const isAllowedAvatar = (value) => {
+  if (value === '' || value.startsWith('data:image/')) return true;
   try {
     const { protocol } = new URL(value);
     return protocol === 'http:' || protocol === 'https:';
@@ -62,6 +62,6 @@ export const profileSchema = z.object({
   avatarUrl: z
     .string()
     .trim()
-    .max(500, 'URL must be 500 characters or fewer')
-    .refine(isOptionalHttpUrl, 'Enter a valid http or https URL'),
+    .refine((value) => value.startsWith('data:image/') || value.length <= 500, 'URL must be 500 characters or fewer')
+    .refine(isAllowedAvatar, 'Enter a valid http or https URL'),
 });

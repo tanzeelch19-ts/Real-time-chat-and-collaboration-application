@@ -138,3 +138,26 @@ domain, the socket client also needs a URL setting.
 - Email invitations, and read or delivery receipts.
 - Video join links (the meeting entry point exists, the provider does not).
 - Public channels are readable by the whole workspace. "Join" records membership for the member list and does not change who can read the channel.
+
+## Batch 10 additions
+
+- **Workspace details:** the owner can set the workspace name, a description (up to 500 characters), and an avatar link. Other members see the same details as read-only text.
+- **Profile photo upload:** pick a PNG, JPEG, GIF, or WebP image up to 512 KB from the profile page. It is stored with the account.
+- **Notifications for invitations and channels:** the inviter is notified when someone joins through their link, and a person is notified when they are added to a channel.
+- **Tests:** role-based checks for owner, admin, member, and guest; a reconnect test that confirms no duplicate messages; upload UI tests; keyboard tests for the workspace switcher, emoji picker, and confirmation dialog; message pagination and invitation/channel notification tests on the mock server.
+- **Browser test:** `e2e/two-sessions.spec.js` runs two real browser sessions with Playwright.
+
+### Running the tests
+
+```bash
+npm test            # unit and component tests (Vitest)
+npm run test:e2e    # browser test (Playwright). Start the app first, or let Playwright start it.
+npm run lint
+```
+
+The first `npm run test:e2e` may ask you to install a browser: `npx playwright install chromium`.
+
+### Still outside the mock backend
+
+- Email invitations and read or delivery receipts.
+- Video join links (the provider is not connected).

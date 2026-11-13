@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { SkeletonList } from '@/components/common/Skeleton';
 import FormAlert from '@/components/forms/FormAlert';
 import AuditPanel from '@/features/audit/components/AuditPanel';
+import WorkspaceDetailsPanel from '@/features/workspaces/components/WorkspaceDetailsPanel';
 import InvitationsPanel from '@/features/workspaces/components/InvitationsPanel';
 import MembersPanel from '@/features/workspaces/components/MembersPanel';
 import { canManageInvitations } from '@/features/workspaces/permissions';
@@ -51,6 +52,7 @@ export default function WorkspaceSettingsPage() {
         </p>
       </header>
 
+      <WorkspaceDetailsPanel workspace={workspace} canEdit={role === 'owner'} />
       {isAdmin && <InvitationsPanel workspaceId={workspaceId} role={role} />}
       <MembersPanel workspaceId={workspaceId} role={role} />
       {isAdmin && <AuditPanel workspaceId={workspaceId} />}

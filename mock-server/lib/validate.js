@@ -1,7 +1,7 @@
-
 import { ApiError } from './apiError.js';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const AVATAR_DATA_LIMIT = 700 * 1024;
 
 export function validateEmail(value) {
   if (typeof value !== 'string' || !EMAIL_PATTERN.test(value.trim()) || value.trim().length > 254) {
@@ -32,9 +32,13 @@ export function validateStatusMessage(value) {
   return null;
 }
 
+/** Accepts '', an http(s) link, or an image uploaded as a data URL (see the avatar upload route). */
 export function validateAvatarUrl(value) {
   if (typeof value !== 'string') return 'Avatar must be a URL.';
   if (value === '') return null;
+  if (value.startsWith('data:image/')) {
+    return value.length <= AVATAR_DATA_LIMIT ? null : 'Avatar image is too large.';
+  }
   if (value.length > 500) return 'URL must be 500 characters or fewer.';
   try {
     const { protocol } = new URL(value);
@@ -44,9 +48,7 @@ export function validateAvatarUrl(value) {
   }
 }
 
-/**
- * Throws a 422 listing every failing field. Pass `null` for valid fields.
- */
+/** Throws a 422 listing every failing field. Pass `null` for valid fields. */
 export function assertValid(checks) {
   const details = Object.entries(checks).flatMap(([field, message]) =>
     message ? [{ field, message }] : [],

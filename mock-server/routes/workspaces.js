@@ -5,7 +5,7 @@ import { ApiError } from '../lib/apiError.js';
 import { recordAudit } from '../lib/auditService.js';
 import { invitationStatus } from '../lib/invitationStatus.js';
 import { can } from '../lib/permissions.js';
-import { assertValid } from '../lib/validate.js';
+import { assertValid, validateAvatarUrl } from '../lib/validate.js';
 import {
   validateInviteRole,
   validateMemberRole,
@@ -24,6 +24,15 @@ import { requireAuth } from '../middleware/requireAuth.js';
 const router = Router();
 router.use(requireAuth);
 
+/** Workspace details: name plus the description and avatar link added for the workspace settings. */
+function workspaceView(workspace, role) {
+  return {
+    ...toWorkspaceView(workspace, role),
+    description: workspace.description ?? '',
+    avatarUrl: workspace.avatarUrl ?? '',
+  };
+}
+
 function toInvitationView(token, invite) {
   return {
     token,
@@ -35,6 +44,8 @@ function toInvitationView(token, invite) {
   };
 }
 
+const DESCRIPTION_OK = (value) => typeof value === 'string' && value.trim().length <= 500;
+
 // Workspaces
 
 router.get('/', (req, res) => {
@@ -42,32 +53,58 @@ router.get('/', (req, res) => {
     .filter((m) => m.userId === req.user.id)
     .map((m) => {
       const workspace = db.workspaces.find((w) => w.id === m.workspaceId);
-      return workspace ? toWorkspaceView(workspace, m.role) : null;
+      return workspace ? workspaceView(workspace, m.role) : null;
     })
     .filter(Boolean);
   res.json({ workspaces });
 });
 
 router.post('/', (req, res) => {
-  const { name } = req.body ?? {};
-  assertValid({ name: validateWorkspaceName(name) });
+  const { name, description = '', avatarUrl = '' } = req.body ?? {};
+  assertValid({
+    name: validateWorkspaceName(name),
+    description: DESCRIPTION_OK(description) ? null : 'Description must be 500 characters or fewer.',
+    avatarUrl: validateAvatarUrl(avatarUrl),
+  });
   const { workspace } = createWorkspace({ name: name.trim(), creatorId: req.user.id });
-  res.status(201).json({ workspace: toWorkspaceView(workspace, 'owner') });
+  workspace.description = description.trim();
+  workspace.avatarUrl = avatarUrl.trim();
+  res.status(201).json({ workspace: workspaceView(workspace, 'owner') });
 });
 
 router.get('/:workspaceId', requireMembership, (req, res) => {
-  res.json({ workspace: toWorkspaceView(req.workspace, req.membership.role) });
+  res.json({ workspace: workspaceView(req.workspace, req.membership.role) });
 });
 
+/** Owner only. Any of name, description, and avatarUrl can be sent on its own. */
 router.patch(
   '/:workspaceId',
   requireMembership,
   requirePermission('workspace:update'),
   (req, res) => {
-    const { name } = req.body ?? {};
-    assertValid({ name: validateWorkspaceName(name) });
-    req.workspace.name = name.trim();
-    res.json({ workspace: toWorkspaceView(req.workspace, req.membership.role) });
+    const body = req.body ?? {};
+    assertValid({
+      name: body.name === undefined ? null : validateWorkspaceName(body.name),
+      description:
+        body.description === undefined || DESCRIPTION_OK(body.description)
+          ? null
+          : 'Description must be 500 characters or fewer.',
+      avatarUrl: body.avatarUrl === undefined ? null : validateAvatarUrl(body.avatarUrl),
+    });
+
+    if (body.name !== undefined) req.workspace.name = body.name.trim();
+    if (body.description !== undefined) req.workspace.description = body.description.trim();
+    if (body.avatarUrl !== undefined) req.workspace.avatarUrl = body.avatarUrl.trim();
+
+    recordAudit({
+      workspaceId: req.workspace.id,
+      actorId: req.user.id,
+      action: 'workspace.update',
+      targetType: 'workspace',
+      targetId: req.workspace.id,
+      summary: 'Updated workspace details',
+    });
+    res.json({ workspace: workspaceView(req.workspace, req.membership.role) });
   },
 );
 
@@ -133,7 +170,6 @@ router.patch('/:workspaceId/members/:userId', requireMembership, (req, res) => {
   res.json({ member: toMemberView(target) });
 });
 
-/** Members can leave on their own. Admins can remove members and guests. The owner cannot leave. */
 router.delete('/:workspaceId/members/:userId', requireMembership, (req, res) => {
   const target = getMembership(req.workspace.id, req.params.userId);
   if (!target) throw new ApiError(404, 'NOT_FOUND', 'Member not found.');
@@ -217,7 +253,6 @@ router.post(
   },
 );
 
-/** Revoking keeps the link in the list with status "Revoked", so admins can see what happened. */
 router.delete(
   '/:workspaceId/invitations/:token',
   requireMembership,

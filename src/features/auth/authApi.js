@@ -28,4 +28,12 @@ export const authApi = {
     const { data } = await api.patch('/users/me', patch);
     return data.user;
   },
+  /** Sends the raw image bytes. The server stores it and returns the updated user. */
+  async uploadAvatar(file) {
+    const { data } = await api.post('/users/me/avatar', file, {
+      headers: { 'Content-Type': file.type },
+      transformRequest: [(body) => body],
+    });
+    return data.user;
+  },
 };

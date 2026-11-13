@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AtSign, Bell, CheckCheck, CornerDownRight, MessageSquare } from 'lucide-react';
+import { AtSign, Bell, CheckCheck, CornerDownRight, Hash, MessageSquare, UserPlus } from 'lucide-react';
 import Button from '@/components/common/Button';
 import { SkeletonList } from '@/components/common/Skeleton';
 import {
@@ -16,6 +16,8 @@ const KIND = {
   mention: { label: 'mentioned you', icon: AtSign },
   reply: { label: 'replied to you', icon: CornerDownRight },
   direct: { label: 'sent you a message', icon: MessageSquare },
+  invitation: { label: 'joined your workspace', icon: UserPlus },
+  channel: { label: 'added you to a channel', icon: Hash },
 };
 
 /** Channel or DM route for a room id such as "channel:<id>" or "conversation:<id>". */
@@ -128,7 +130,7 @@ export default function NotificationBell() {
                         onClick={() => {
                           markRead.mutate(notification.id);
                           setOpen(false);
-                          navigate(pathFor(notification));
+                          navigate(notification.roomId ? pathFor(notification) : '/w/' + notification.workspaceId + '/settings');
                         }}
                         className={cn(
                           'flex w-full gap-3 px-4 py-3 text-left hover:bg-slate-100 dark:hover:bg-slate-800',

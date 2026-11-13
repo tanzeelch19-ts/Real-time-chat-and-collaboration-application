@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db, removeWhere } from '../data/store.js';
 import { ApiError } from '../lib/apiError.js';
 import { unreadCountFor, updateChannelDetails } from '../lib/channelExtras.js';
+import { createNotification } from '../lib/notificationService.js';
 import { isAdminOrAbove } from '../lib/permissions.js';
 import { isMuted } from '../lib/roomSettings.js';
 import { assertValid } from '../lib/validate.js';
@@ -98,7 +99,6 @@ router.get('/:workspaceId/channels/:channelId', requireMembership, (req, res) =>
   res.json({ channel: toChannelView(findVisibleChannel(req)) });
 });
 
-/** Explicit members of a channel. Public channels are readable by everyone, so this list is "who joined". */
 router.get('/:workspaceId/channels/:channelId/members', requireMembership, (req, res) => {
   const channel = findVisibleChannel(req);
   const members = db.channelMembers
@@ -107,7 +107,7 @@ router.get('/:workspaceId/channels/:channelId/members', requireMembership, (req,
   res.json({ members });
 });
 
-/** A manager (creator, owner, or admin) adds a workspace member to the channel. */
+/** A manager (creator, owner, or admin) adds a workspace member. The added person is notified. */
 router.post('/:workspaceId/channels/:channelId/members', requireMembership, (req, res) => {
   const channel = findVisibleChannel(req);
   const { userId } = req.body ?? {};
@@ -125,10 +125,17 @@ router.post('/:workspaceId/channels/:channelId/members', requireMembership, (req
   }
 
   addChannelMember(channel.id, userId);
+  createNotification({
+    userId,
+    kind: 'channel',
+    workspaceId: req.workspace.id,
+    roomId: `channel:${channel.id}`,
+    actorId: req.user.id,
+    preview: `#${channel.name}`,
+  });
   res.status(201).json({ channelId: channel.id, userId, added: true });
 });
 
-/** Any member except a guest can join a public channel on their own. */
 router.post('/:workspaceId/channels/:channelId/join', requireMembership, (req, res) => {
   const channel = findVisibleChannel(req);
   if (channel.visibility !== 'public') {
@@ -141,7 +148,6 @@ router.post('/:workspaceId/channels/:channelId/join', requireMembership, (req, r
   res.status(201).json({ joined: true });
 });
 
-/** People can leave on their own. Managers can remove anyone from the channel. */
 router.delete('/:workspaceId/channels/:channelId/members/:userId', requireMembership, (req, res) => {
   const channel = findVisibleChannel(req);
   const isSelf = req.params.userId === req.user.id;
@@ -155,7 +161,6 @@ router.delete('/:workspaceId/channels/:channelId/members/:userId', requireMember
   res.status(204).end();
 });
 
-/** Creator, owner, or admin can change the topic, description, or archive state. */
 router.patch('/:workspaceId/channels/:channelId', requireMembership, (req, res) => {
   const channel = findVisibleChannel(req);
   if (!canManageChannel(channel, req.membership.role, req.user.id)) {

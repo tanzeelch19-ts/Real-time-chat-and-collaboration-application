@@ -1,4 +1,5 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
+import { ApiError } from '../lib/apiError.js';
 import { preferencesOf } from '../lib/notificationService.js';
 import { toPublicUser } from '../lib/publicUser.js';
 import {
@@ -8,6 +9,9 @@ import {
   validateStatusMessage,
 } from '../lib/validate.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+
+const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+const AVATAR_MAX_BYTES = 512 * 1024;
 
 const router = Router();
 router.use(requireAuth);
@@ -28,6 +32,21 @@ router.patch('/me', (req, res) => {
   if (body.statusMessage !== undefined) req.user.statusMessage = body.statusMessage.trim();
   if (body.avatarUrl !== undefined) req.user.avatarUrl = body.avatarUrl.trim();
 
+  res.json({ user: toPublicUser(req.user) });
+});
+
+/** Uploads a profile photo. The image is stored as a data URL on the user. */
+router.post('/me/avatar', express.raw({ type: AVATAR_TYPES, limit: AVATAR_MAX_BYTES }), (req, res) => {
+  const mime = (req.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
+  if (!AVATAR_TYPES.includes(mime)) {
+    throw new ApiError(415, 'UNSUPPORTED_MEDIA_TYPE', 'Use a PNG, JPEG, GIF, or WebP image.');
+  }
+  if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+    throw new ApiError(422, 'VALIDATION_ERROR', 'Please fix the highlighted fields.', [
+      { field: 'file', message: 'The image is empty.' },
+    ]);
+  }
+  req.user.avatarUrl = `data:${mime};base64,${req.body.toString('base64')}`;
   res.json({ user: toPublicUser(req.user) });
 });
 

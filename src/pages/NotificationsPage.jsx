@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { AtSign, Bell, CheckCheck, CornerDownRight, MessageSquare } from 'lucide-react';
+import { AtSign, Bell, CheckCheck, CornerDownRight, Hash, MessageSquare, UserPlus } from 'lucide-react';
 import Button from '@/components/common/Button';
 import EmptyState from '@/components/common/EmptyState';
 import { SkeletonList } from '@/components/common/Skeleton';
@@ -19,6 +19,8 @@ const KIND = {
   mention: { label: 'mentioned you', icon: AtSign },
   reply: { label: 'replied to you', icon: CornerDownRight },
   direct: { label: 'sent you a message', icon: MessageSquare },
+  invitation: { label: 'joined your workspace', icon: UserPlus },
+  channel: { label: 'added you to a channel', icon: Hash },
 };
 
 const TIME = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -49,7 +51,7 @@ export default function NotificationsPage() {
 
   const open = (notification) => {
     if (!notification.readAt) markRead.mutate(notification.id);
-    navigate(pathFor(workspaceId, notification.roomId));
+    navigate(notification.roomId ? pathFor(workspaceId, notification.roomId) : '/w/' + workspaceId + '/settings');
   };
 
   return (

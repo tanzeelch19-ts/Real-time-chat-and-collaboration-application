@@ -6,7 +6,7 @@ import { parseRoomId } from './rooms.js';
 import { isMuted } from './roomSettings.js';
 import { canSeeChannel, getMembership } from './workspaceService.js';
 
-/** Every kind is on by default. A user can switch each one off on the preferences page. */
+/** Mention, reply, and direct kinds can be switched off per user. Invitation and channel kinds always send. */
 const DEFAULT_PREFS = { mentions: true, replies: true, direct: true };
 const KIND_TO_PREF = { mention: 'mentions', reply: 'replies', direct: 'direct' };
 
@@ -22,10 +22,7 @@ export function mentionsEveryone(body) {
   return CHANNEL_WIDE.test(body);
 }
 
-/**
- * Finds people written as "@Full Name" in the body. Longer names are matched first,
- * and matched text is blanked, so "@Ayesha Owner" does not also count as "@Ayesha".
- */
+/** Finds people written as "@Full Name". Longer names are matched first and matched text is blanked. */
 export function findMentionedUserIds(body, candidates) {
   const found = new Set();
   let remaining = body;
@@ -43,7 +40,6 @@ export function findMentionedUserIds(body, candidates) {
   return [...found];
 }
 
-/** Who could be notified in this room, plus the workspace it belongs to. */
 function describeRoom(roomId) {
   const parsed = parseRoomId(roomId);
   if (!parsed) return null;
@@ -67,6 +63,29 @@ function describeRoom(roomId) {
 }
 
 /**
+ * Creates one notification and pushes it to the recipient. Used for invitations and
+ * channel additions. Returns null when the actor and the recipient are the same person.
+ */
+export function createNotification({ userId, kind, workspaceId, roomId = null, actorId, preview = '' }) {
+  if (!userId || userId === actorId) return null;
+  const notification = {
+    id: randomUUID(),
+    userId,
+    kind,
+    workspaceId,
+    roomId,
+    messageId: null,
+    actorId,
+    preview: String(preview).slice(0, 140),
+    createdAt: new Date().toISOString(),
+    readAt: null,
+  };
+  db.notifications.push(notification);
+  emitToUser(userId, 'notification:new', toNotificationView(notification));
+  return notification;
+}
+
+/**
  * Creates notifications for a new message and pushes each one to the recipient.
  * Priority per person: mention, then reply, then direct message. Switched-off kinds
  * and muted rooms are skipped.
@@ -85,7 +104,6 @@ export function notifyForMessage({ roomId, messageId, authorId, body, parentAuth
     planned.set(userId, kind);
   };
 
-  // @channel reaches everyone who can see the channel, but only owners and admins may use it.
   if (room.kind === 'channel' && mentionsEveryone(body)) {
     const role = getMembership(room.workspaceId, authorId)?.role;
     if (role === 'owner' || role === 'admin') {
@@ -145,14 +163,13 @@ export function listNotifications(userId, { unreadOnly = false, limit = 50 } = {
   return { notifications, unreadCount: mine.filter((n) => !n.readAt).length };
 }
 
-/** Unread total and unread counts per room, for sidebar badges. */
 export function notificationSummary(userId) {
   const byRoom = {};
   let total = 0;
   for (const n of db.notifications) {
     if (n.userId !== userId || n.readAt) continue;
     total += 1;
-    byRoom[n.roomId] = (byRoom[n.roomId] ?? 0) + 1;
+    if (n.roomId) byRoom[n.roomId] = (byRoom[n.roomId] ?? 0) + 1;
   }
   return { total, byRoom };
 }

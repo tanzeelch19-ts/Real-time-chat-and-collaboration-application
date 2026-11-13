@@ -7,3 +7,6 @@ test-upload.txt
 downloaded.txt
 .env
 !.env.example
+test-results/
+playwright-report/
+blob-report/
