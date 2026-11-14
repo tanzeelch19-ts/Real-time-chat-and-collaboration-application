@@ -161,3 +161,15 @@ The first `npm run test:e2e` may ask you to install a browser: `npx playwright i
 
 - Email invitations and read or delivery receipts.
 - Video join links (the provider is not connected).
+## Live demo and local run
+
+The Vercel site shows the interface. It does not run the backend (login and chat), because the mock API and Socket.IO server are development tools. To use the full app, run it on your computer:
+
+```bash
+npm install
+npm run dev
+```
+
+Then open http://localhost:5173 and sign in with owner@demo.test / Password123! (see the demo accounts above). To test real-time messages, use a second window (incognito) with another account.
+
+To host the backend yourself, run `node mock-server/server.js` on any Node host that allows long-running servers, set `CORS_ORIGIN` to the frontend URL, and set `VITE_API_URL` and `VITE_SOCKET_URL` in the frontend host before building.
