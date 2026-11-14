@@ -58,7 +58,9 @@ export default function LoginPage() {
         <FormAlert tone="info" className="mb-4">
           This is the interface only. The login and chat backend is not connected on this site. Run the full app locally with npm run dev (see README).
         </FormAlert>
-      )}      {sessionExpiredReason === 'expired' && (
+      )}
+
+      {sessionExpiredReason === 'expired' && (
         <FormAlert tone="info" className="mb-4">
           Your session has expired. Please sign in again.
         </FormAlert>
@@ -91,7 +93,7 @@ export default function LoginPage() {
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? 'Signing inâ€¦' : 'Sign in'}
+          {isSubmitting ? 'Signing in...' : 'Sign in'}
         </Button>
       </form>
     </AuthLayout>
