@@ -21,6 +21,27 @@ export function createApp() {
   loadDb();
 
   const app = express();
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Caption');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+    if (req.method === 'OPTIONS') return res.status(204).end();
+    next();
+  });
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Caption');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+    if (req.method === 'OPTIONS') return res.status(204).end();
+    next();
+  });
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Caption');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
+    if (req.method === 'OPTIONS') return res.status(204).end();
+    next();
+  });
   // Cross-origin access for a frontend hosted elsewhere (for example Vercel).
   // Only origins listed in CORS_ORIGIN (comma-separated) are allowed.
   const allowedOrigins = (process.env.CORS_ORIGIN || '')
