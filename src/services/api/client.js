@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getAccessToken } from '@/services/api/tokenStorage';
-import { normalizeError } from '@/services/api/errors';
+import { ApiClientError, normalizeError } from '@/services/api/errors';
 
 /** Auth calls where a 401 means "wrong credentials", not "session expired". */
 const PUBLIC_AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'];
@@ -25,7 +25,16 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // A web page instead of JSON means the request never reached the API (usually a missing VITE_API_URL).
+    if (typeof response.data === 'string' && response.data.trimStart().startsWith('<')) {
+      throw new ApiClientError({
+        code: 'NOT_API',
+        message: 'Cannot reach the server. The app is not connected to its backend. Check the VITE_API_URL setting and redeploy.',
+      });
+    }
+    return response;
+  },
   (error) => {
     const normalized = normalizeError(error);
     const path = error.config?.url ?? '';
