@@ -54,12 +54,6 @@ export default function LoginPage() {
         </>
       }
     >
-      {import.meta.env.PROD && (
-        <FormAlert tone="info" className="mb-4">
-          This is the interface only. The login and chat backend is not connected on this site. Run the full app locally with npm run dev (see README).
-        </FormAlert>
-      )}
-
       {sessionExpiredReason === 'expired' && (
         <FormAlert tone="info" className="mb-4">
           Your session has expired. Please sign in again.

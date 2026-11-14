@@ -1,3 +1,13 @@
+---
+title: Real-Time Chat and Collaboration
+emoji: 💬
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Real-Time Chat and Collaboration
 
 A React chat and collaboration app with workspaces, channels, direct and group
