@@ -106,10 +106,9 @@ Limits to know before deploying:
 
 ## Known gaps
 
-- Notification preferences and appearance preferences screen.
-- `@channel` mentions.
-- Code splitting: the production bundle is about 720 kB, which triggers Vite's size warning.
-- An automated browser test that drives two sessions (the manual checklist above covers it).
+- Email invitations and read or delivery receipts (not possible with the mock backend).
+- Video join links (the meeting provider is not connected).
+- Production bundle is about 550 kB, which triggers Vite's chunk size warning. Pages are already lazy-loaded.
 
 ## Build and deployment
 
