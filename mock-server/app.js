@@ -15,6 +15,7 @@ import auditRoutes from './routes/audit.js';
 import roomSettingsRoutes from './routes/roomSettings.js';
 import { errorHandler, notFound } from './middleware/errors.js';
 import { loadDb, saveDb } from './lib/persist.js';
+import { securityHeaders, authRateLimit, requestLogger } from './lib/security.js';
 
 /** Builds the mock API. Used by the Vite dev server. */
 export function createApp() {
@@ -68,6 +69,8 @@ export function createApp() {
   });
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
+  app.use('/api/auth/login', authRateLimit);
+  app.use('/api/auth/register', authRateLimit);
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/workspaces', workspaceRoutes);
