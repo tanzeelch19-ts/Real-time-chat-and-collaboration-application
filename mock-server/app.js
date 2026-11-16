@@ -60,6 +60,9 @@ export function createApp() {
     if (req.method === 'OPTIONS') return res.sendStatus(204);
     next();
   });
+  app.disable('x-powered-by');
+  app.use(securityHeaders);
+  app.use(requestLogger);
   app.use(express.json({ limit: '100kb' }));
 
   // Save after every change, so accounts, workspaces, and messages survive restarts.
