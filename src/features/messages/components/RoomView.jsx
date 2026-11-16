@@ -76,6 +76,22 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
   const [uploadProgress, setUploadProgress] = useState(null);
   const [failedUpload, setFailedUpload] = useState(null);
   const bottomRef = useRef(null);
+  const scrollRef = useRef(null);
+  const nearBottomRef = useRef(true);
+  const [showNew, setShowNew] = useState(false);
+  const [openedAt] = useState(() => new Date().toISOString());
+  const memberNameMap = Object.fromEntries(members.map((m) => [m.userId, m.displayName]));
+  const jumpToBottom = () => {
+    nearBottomRef.current = true;
+    setShowNew(false);
+    bottomRef.current?.scrollIntoView({ block: "end" });
+  };
+  const onScrollList = (event) => {
+    const el = event.currentTarget;
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    nearBottomRef.current = near;
+    if (near) setShowNew(false);
+  };
   const handledTarget = useRef(null);
   const attemptedCursor = useRef(null);
 
@@ -121,7 +137,7 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
   // Scroll to the newest message, unless a search target is still being found.
   useEffect(() => {
     if (targetId && handledTarget.current !== targetId) return;
-    bottomRef.current?.scrollIntoView({ block: 'end' });
+    if (nearBottomRef.current) bottomRef.current?.scrollIntoView({ block: 'end' }); else setShowNew(true);
   }, [messageCount, targetId]);
 
   // Opening the room, or seeing new messages in it, clears its notifications.
@@ -143,7 +159,7 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
     const body = text.trim();
     if (!body) return;
     send(body);
-    dispatch(clearDraft(roomId));
+    dispatch(clearDraft(roomId)); nearBottomRef.current = true; setShowNew(false);
     stopTyping();
   };
 
@@ -217,7 +233,7 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
           />
         )}
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+        <div ref={scrollRef} onScroll={onScrollList} className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           {isPending && <SkeletonList rows={4} label="Loading messages" />}
           {isError && <FormAlert>{toSerializableError(error).message}</FormAlert>}
 
@@ -235,7 +251,7 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
                 </div>
               )}
               <MessageList
-                messages={data.messages}
+                messages={data.messages} openedAt={openedAt} memberNames={memberNameMap}
                 currentUserId={user?.id}
                 canModerate={canModerate}
                 mentionNames={mentionNames}
@@ -253,7 +269,12 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
           <div ref={bottomRef} />
         </div>
 
-        <p aria-live="polite" className="h-5 shrink-0 px-4 text-xs text-slate-500 dark:text-slate-400 sm:px-6">
+        {showNew && (
+  <div className="flex justify-center px-4 pb-2 sm:px-6">
+    <Button className="h-8 px-3" onClick={jumpToBottom}>New messages</Button>
+  </div>
+)}
+<p aria-live="polite" className="h-5 shrink-0 px-4 text-xs text-slate-500 dark:text-slate-400 sm:px-6">
           {typingText(typers)}
         </p>
 

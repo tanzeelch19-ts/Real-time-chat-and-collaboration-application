@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import { Bookmark, MessageSquare, Pencil, Pin, Smile, Trash2 } from 'lucide-react';
+import { Bookmark, Check, Copy, MessageSquare, Pencil, Pin, Smile, Trash2 } from 'lucide-react';
 import Avatar from '@/components/common/Avatar';
 import Button from '@/components/common/Button';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import EmojiPicker from '@/components/common/EmojiPicker';
 import AttachmentPreview from '@/components/messaging/AttachmentPreview';
-import MentionText from '@/components/messaging/MentionText';
+import RichText from '@/components/messaging/RichText';
 import { cn } from '@/utils/cn';
 
 const TIME_FORMAT = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
 
 /**
- * One message. Actions appear on hover or keyboard focus. Grouped messages hide the header
- * and show the time in the gutter on hover. Deleting asks for confirmation first.
+ * One message. Actions appear on hover or keyboard focus. Grouped messages hide the header.
+ * The time shows the full date on hover. Reactions list the people who reacted. Deleting asks first.
  */
 export default function MessageItem({
   message,
@@ -21,6 +21,7 @@ export default function MessageItem({
   readOnly = false,
   grouped = false,
   mentionNames = [],
+  memberNames = {},
   pinnedIds = [],
   savedIds = [],
   onOpenThread,
@@ -35,6 +36,7 @@ export default function MessageItem({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [actionError, setActionError] = useState(null);
 
   const isMine = message.author.id === currentUserId;
@@ -45,6 +47,7 @@ export default function MessageItem({
   const isPinned = pinnedIds.includes(message.id);
   const isSaved = savedIds.includes(message.id);
   const time = TIME_FORMAT.format(new Date(message.createdAt));
+  const fullTime = new Date(message.createdAt).toLocaleString();
 
   const canReact = !deleted && !busy;
   const canReply = !readOnly && !message.threadId && !deleted && !busy;
@@ -52,8 +55,11 @@ export default function MessageItem({
   const canDelete = !readOnly && (isMine || canModerate) && !deleted && !busy;
   const canPin = Boolean(onTogglePin) && !deleted && !busy;
   const canSave = Boolean(onToggleSave) && !deleted && !busy;
-  const showToolbar = !editing && (canReact || canReply || canEdit || canDelete || canPin || canSave);
+  const canCopy = !deleted && !pending;
+  const showToolbar = !editing && (canReact || canReply || canEdit || canDelete || canPin || canSave || canCopy);
   const showStatusRow = !grouped || pending || failed || isPinned || (message.editedAt && !deleted);
+
+  const reactorNames = (ids) => ids.map((id) => memberNames[id] ?? 'Someone').join(', ');
 
   const runAction = async (action, fallback) => {
     setActionError(null);
@@ -115,6 +121,16 @@ export default function MessageItem({
   const togglePin = () => runAction(() => onTogglePin(message.id), 'Could not change the pin.');
   const toggleSave = () => runAction(() => onToggleSave(message.id), 'Could not change the save.');
 
+  const copyText = async () => {
+    try {
+      await navigator.clipboard.writeText(message.body);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setActionError('Could not copy this message.');
+    }
+  };
+
   return (
     <li
       data-message-id={message.id}
@@ -127,6 +143,7 @@ export default function MessageItem({
         <div className="flex w-9 shrink-0 justify-center pt-1">
           <time
             dateTime={message.createdAt}
+            title={fullTime}
             className="hidden text-[10px] text-slate-400 group-focus-within:block group-hover:block"
           >
             {time}
@@ -141,8 +158,17 @@ export default function MessageItem({
           <div className="flex flex-wrap items-baseline gap-2">
             {!grouped && (
               <>
-                <span className="text-sm font-semibold">{message.author.displayName}</span>{isMine && <span className="ml-1 rounded bg-brand-100 px-1.5 text-[11px] font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">you</span>}
-                <time dateTime={message.createdAt} className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-sm font-semibold">{message.author.displayName}</span>
+                {isMine && (
+                  <span className="rounded bg-brand-100 px-1.5 text-[11px] font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+                    you
+                  </span>
+                )}
+                <time
+                  dateTime={message.createdAt}
+                  title={fullTime}
+                  className="text-xs text-slate-500 dark:text-slate-400"
+                >
                   {time}
                 </time>
               </>
@@ -187,7 +213,7 @@ export default function MessageItem({
               failed && 'text-red-600 dark:text-red-400',
             )}
           >
-            <MentionText text={message.body} names={mentionNames} />
+            <RichText text={message.body} names={mentionNames} />
           </p>
         )}
 
@@ -205,6 +231,7 @@ export default function MessageItem({
                   key={reaction.emoji}
                   type="button"
                   aria-pressed={mine}
+                  title={reactorNames(reaction.userIds)}
                   aria-label={`${reaction.emoji} ${reaction.count}${mine ? ', you reacted' : ''}`}
                   onClick={() => react(reaction.emoji)}
                   className={cn(
@@ -259,6 +286,11 @@ export default function MessageItem({
               <Smile size={14} aria-hidden="true" />
             </Button>
           )}
+          {canCopy && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Copy message" onClick={copyText}>
+              {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
+            </Button>
+          )}
           {canPin && (
             <Button
               variant="ghost"
@@ -295,13 +327,7 @@ export default function MessageItem({
             </Button>
           )}
           {canEdit && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              aria-label="Edit this message"
-              onClick={startEditing}
-            >
+            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit this message" onClick={startEditing}>
               <Pencil size={14} aria-hidden="true" />
             </Button>
           )}
