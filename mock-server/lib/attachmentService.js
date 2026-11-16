@@ -14,7 +14,7 @@ export const ALLOWED_MIME_TYPES = [
   'text/plain',
 ];
 
-const UPLOAD_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'data', 'uploads');
+const UPLOAD_DIR = join(process.env.DATA_DIR || join(dirname(fileURLToPath(import.meta.url)), '..', 'data'), 'uploads');
 
 /** Headers sent by the browser are percent-encoded, so UTF-8 names survive. */
 export function decodeHeader(value) {

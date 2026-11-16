@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { db } from '../data/store.js';
 
 /** Dev-only file. Delete it to reset the demo data. Uploaded file contents live in data/uploads. */
-const FILE = join(dirname(fileURLToPath(import.meta.url)), '..', 'data', 'db.json');
+const DATA_DIR = process.env.DATA_DIR || join(dirname(fileURLToPath(import.meta.url)), '..', 'data');
+const FILE = join(DATA_DIR, 'db.json');
 
 const LIST_KEYS = [
   'users', 'workspaces', 'memberships', 'channels', 'channelMembers',
