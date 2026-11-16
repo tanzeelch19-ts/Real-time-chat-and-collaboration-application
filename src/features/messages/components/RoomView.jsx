@@ -16,6 +16,7 @@ import { usePinnedMessages, useSavedMessages, useToggleSave, useTogglePin } from
 import ThreadPanel from '@/features/messages/components/ThreadPanel';
 import { clearDraft, selectDraft, setDraft } from '@/features/messages/draftsSlice';
 import { useTypingIndicator } from '@/features/messages/useTypingIndicator';
+import { useRoomSync } from '@/features/messages/useRoomSync';
 import {
   useDeleteMessage,
   useEditMessage,
@@ -63,6 +64,7 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
   const toggleSave = useToggleSave(roomId);
   const meetings = useRoomMeetings(roomId);
   const { typers, notifyTyping, stopTyping } = useTypingIndicator(roomId);
+  useRoomSync(roomId);
 
   const draftSelector = useMemo(() => selectDraft(roomId), [roomId]);
   const text = useSelector(draftSelector);
