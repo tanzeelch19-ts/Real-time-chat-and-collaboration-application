@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import Button from '@/components/common/Button';
+import { notificationsApi } from '@/features/notifications/notificationsApi';
 import { connectSocket } from '@/services/socket/socketClient';
 
 const LABELS = {
@@ -11,28 +12,58 @@ const LABELS = {
   channel: 'added you to a channel',
 };
 const SHOW_MS = 6000;
+const POLL_MS = 4000;
 
 /**
- * In-app alert for each new notification. It appears even when the person is already looking at
- * the room, because those notifications are marked read on arrival and would otherwise go unnoticed.
+ * Shows an alert for every new notification. It checks the server every 4 seconds and also
+ * listens for the socket event, so the alert appears even if one of the two is missed.
+ * Notifications that already existed when the page opened are not shown again.
  */
 export default function NotificationToast() {
   const [toasts, setToasts] = useState([]);
+  const seen = useRef(null);
+
+  const show = (item) => {
+    setToasts((current) => (current.some((t) => t.id === item.id) ? current : [...current.slice(-2), item]));
+    setTimeout(() => setToasts((current) => current.filter((t) => t.id !== item.id)), SHOW_MS);
+  };
 
   useEffect(() => {
+    let cancelled = false;
+
+    const check = async () => {
+      try {
+        const list = await notificationsApi.list();
+        if (cancelled) return;
+        if (seen.current === null) {
+          seen.current = new Set(list.map((n) => n.id));
+          return;
+        }
+        for (const n of list) {
+          if (seen.current.has(n.id)) continue;
+          seen.current.add(n.id);
+          if (!n.readAt) show({ id: n.id, actor: n.actor?.displayName ?? 'Someone', kind: n.kind, preview: n.preview ?? '' });
+        }
+      } catch {
+        // Next tick tries again.
+      }
+    };
+
+    check();
+    const timer = setInterval(check, POLL_MS);
+
     const socket = connectSocket();
-    const onNew = (notification) => {
-      const item = {
-        id: notification.id,
-        actor: notification.actor?.displayName ?? 'Someone',
-        kind: notification.kind,
-        preview: notification.preview ?? '',
-      };
-      setToasts((current) => [...current.slice(-2), item]);
-      setTimeout(() => setToasts((current) => current.filter((t) => t.id !== item.id)), SHOW_MS);
+    const onNew = (n) => {
+      if (seen.current) seen.current.add(n.id);
+      show({ id: n.id, actor: n.actor?.displayName ?? 'Someone', kind: n.kind, preview: n.preview ?? '' });
     };
     socket.on('notification:new', onNew);
-    return () => socket.off('notification:new', onNew);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+      socket.off('notification:new', onNew);
+    };
   }, []);
 
   const dismiss = (id) => setToasts((current) => current.filter((t) => t.id !== id));

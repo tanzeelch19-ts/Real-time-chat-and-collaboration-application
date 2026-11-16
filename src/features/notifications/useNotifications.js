@@ -9,12 +9,13 @@ export const notificationKeys = {
   list: ['notifications', 'list'],
 };
 
-/** Unread total and per-room counts. Refreshed each minute, and on every socket push. */
+/** Unread counts. Refreshed every 4 seconds, so the bell updates without a page reload. */
 export function useNotificationSummary() {
   return useQuery({
     queryKey: notificationKeys.summary,
     queryFn: () => notificationsApi.summary(),
-    refetchInterval: 60000,
+    refetchInterval: 4000,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -26,7 +27,7 @@ export function useNotificationList(enabled) {
   });
 }
 
-/** Refreshes the badge and list the moment the server pushes a notification. */
+/** Socket push still refreshes the badge at once when it arrives. Polling covers any missed event. */
 export function useNotificationSocketSync() {
   const queryClient = useQueryClient();
   useEffect(() => {
