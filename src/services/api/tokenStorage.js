@@ -1,13 +1,13 @@
 /**
- * Access-token storage. localStorage keeps the user signed in across tabs and
- * browser restarts. Swap this module for httpOnly cookies once the real backend
- * strategy is confirmed. Components never read the token directly.
+ * Access-token storage. sessionStorage keeps each browser window or tab signed in separately:
+ * a new window starts signed out, and a refresh keeps the session. Swap this module for
+ * httpOnly cookies once the real backend strategy is confirmed.
  */
 const TOKEN_KEY = 'chat.accessToken';
 
 export function getAccessToken() {
   try {
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY);
   } catch {
     return null;
   }
@@ -15,7 +15,7 @@ export function getAccessToken() {
 
 export function setAccessToken(token) {
   try {
-    localStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(TOKEN_KEY, token);
   } catch {
     // Storage unavailable; the session lasts only until a reload.
   }
@@ -23,6 +23,7 @@ export function setAccessToken(token) {
 
 export function clearAccessToken() {
   try {
+    sessionStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(TOKEN_KEY);
   } catch {
     // Storage unavailable; nothing to clear.

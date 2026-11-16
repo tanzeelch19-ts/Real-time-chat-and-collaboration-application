@@ -20,7 +20,7 @@ const makeStore = () => configureStore({ reducer: { auth: authReducer } });
 describe('auth slice', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('stores the access token and marks the user authenticated on login', async () => {
@@ -30,7 +30,7 @@ describe('auth slice', () => {
     await store.dispatch(loginUser({ email: 'owner@demo.test', password: 'Password123!' }));
 
     expect(selectIsAuthenticated(store.getState())).toBe(true);
-    expect(localStorage.getItem('chat.accessToken')).toBe('tok-123');
+    expect(sessionStorage.getItem('chat.accessToken')).toBe('tok-123');
   });
 
   it('stores a serializable error when login fails', async () => {
@@ -55,13 +55,13 @@ describe('auth slice', () => {
   });
 
   it('clears the local session even when the logout request fails', async () => {
-    localStorage.setItem('chat.accessToken', 'tok-123');
+    sessionStorage.setItem('chat.accessToken', 'tok-123');
     authApi.logout.mockRejectedValue(new Error('network down'));
     const store = makeStore();
 
     await store.dispatch(logoutUser());
 
-    expect(localStorage.getItem('chat.accessToken')).toBeNull();
+    expect(sessionStorage.getItem('chat.accessToken')).toBeNull();
     expect(store.getState().auth.status).toBe('anonymous');
   });
 });
