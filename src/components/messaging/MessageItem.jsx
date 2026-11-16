@@ -141,7 +141,7 @@ export default function MessageItem({
           <div className="flex flex-wrap items-baseline gap-2">
             {!grouped && (
               <>
-                <span className="text-sm font-semibold">{message.author.displayName}</span>
+                <span className="text-sm font-semibold">{message.author.displayName}</span>{isMine && <span className="ml-1 rounded bg-brand-100 px-1.5 text-[11px] font-semibold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">you</span>}
                 <time dateTime={message.createdAt} className="text-xs text-slate-500 dark:text-slate-400">
                   {time}
                 </time>
