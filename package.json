@@ -49,5 +49,11 @@
     "tailwindcss": "^4.3.5",
     "vite": "^8.3.8",
     "vitest": "^5.1.0"
+  },
+  "description": "Real-time chat and collaboration app: workspaces, channels, direct messages, search, notifications, and role-based permissions.",
+  "author": "Ch Tanzeel",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
   }
 }
