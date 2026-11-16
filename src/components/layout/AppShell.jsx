@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import TopBar from '@/components/layout/TopBar';
+import NotificationToast from '@/components/notifications/NotificationToast';
 import WorkspaceSidebar from '@/components/navigation/WorkspaceSidebar';
 import { useRealtimeSync } from '@/features/realtime/useRealtimeSync';
 import { selectSidebarOpen, setSidebarOpen } from '@/features/ui/uiSlice';
@@ -33,6 +34,7 @@ export default function AppShell() {
       )}
 
       <WorkspaceSidebar open={sidebarOpen} onClose={closeSidebar} />
+      <NotificationToast />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar />
