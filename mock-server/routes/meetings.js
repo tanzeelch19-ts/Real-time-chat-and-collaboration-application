@@ -37,9 +37,7 @@ router.get('/:roomId/meetings', (req, res) => {
   if (!resolveRoomAccess(req.params.roomId, req.user.id)) {
     throw new ApiError(404, 'NOT_FOUND', 'Conversation not found.');
   }
-  const meetings = db.meetings
-    .filter((m) => m.roomId === req.params.roomId && !m.endedAt)
-    .map(toMeetingView);
+  const meetings = db.meetings.filter((m) => m.roomId === req.params.roomId && !m.endedAt).map(toMeetingView);
   res.json({ meetings });
 });
 

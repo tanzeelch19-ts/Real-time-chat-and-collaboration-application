@@ -7,9 +7,7 @@ const CHANNEL = { id: 'c1', name: 'general', topic: 'Daily updates', description
 
 describe('ChannelSettingsDialog', () => {
   it('shows the current topic, with archive unchecked for an active channel', () => {
-    renderWithProviders(
-      <ChannelSettingsDialog open onClose={() => {}} workspaceId="w1" channel={CHANNEL} />,
-    );
+    renderWithProviders(<ChannelSettingsDialog open onClose={() => {}} workspaceId="w1" channel={CHANNEL} />);
     expect(screen.getByLabelText('Topic')).toHaveValue('Daily updates');
     expect(screen.getByRole('checkbox', { name: /Archive this channel/ })).not.toBeChecked();
   });

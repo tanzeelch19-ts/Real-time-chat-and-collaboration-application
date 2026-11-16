@@ -53,9 +53,7 @@ export default function InvitationPage() {
       subtitle={`You have been invited as ${ROLE_LABELS[role] ?? role}.`}
       footer={footer}
     >
-      {accept.isError && (
-        <FormAlert className="mb-4">{toSerializableError(accept.error).message}</FormAlert>
-      )}
+      {accept.isError && <FormAlert className="mb-4">{toSerializableError(accept.error).message}</FormAlert>}
 
       {alreadyMember ? (
         <div className="space-y-4 text-center">

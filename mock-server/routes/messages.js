@@ -28,8 +28,7 @@ function publish(roomId, views) {
 router.get('/:roomId/messages', (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit) || 30, 1), 100);
   const before = typeof req.query.before === 'string' ? req.query.before : undefined;
-  const threadId =
-    typeof req.query.threadId === 'string' && req.query.threadId ? req.query.threadId : null;
+  const threadId = typeof req.query.threadId === 'string' && req.query.threadId ? req.query.threadId : null;
 
   const { page } = unwrap(
     listRoomMessages({ roomId: req.params.roomId, userId: req.user.id, before, limit, threadId }),

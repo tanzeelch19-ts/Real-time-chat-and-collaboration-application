@@ -22,29 +22,10 @@ export function createApp() {
   loadDb();
 
   const app = express();
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Caption');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-    if (req.method === 'OPTIONS') return res.status(204).end();
-    next();
-  });
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Caption');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-    if (req.method === 'OPTIONS') return res.status(204).end();
-    next();
-  });
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Caption');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-    if (req.method === 'OPTIONS') return res.status(204).end();
-    next();
-  });
+
   // Cross-origin access for a frontend hosted elsewhere (for example Vercel).
-  // Only origins listed in CORS_ORIGIN (comma-separated) are allowed.
+  // Only origins listed in CORS_ORIGIN (comma-separated) are allowed. When it is empty,
+  // only same-origin requests work, which is the case for the single-server deployment.
   const allowedOrigins = (process.env.CORS_ORIGIN || '')
     .split(',')
     .map((origin) => origin.trim())
@@ -54,7 +35,7 @@ export function createApp() {
     if (origin && allowedOrigins.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,PUT,DELETE,OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Caption');
       res.setHeader('Vary', 'Origin');
     }
     if (req.method === 'OPTIONS') return res.sendStatus(204);
@@ -74,6 +55,8 @@ export function createApp() {
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
   app.use('/api/auth/login', authRateLimit);
   app.use('/api/auth/register', authRateLimit);
+  app.use('/api/auth/forgot-password', authRateLimit);
+  app.use('/api/auth/reset-password', authRateLimit);
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/workspaces', workspaceRoutes);

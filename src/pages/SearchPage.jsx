@@ -33,7 +33,13 @@ export default function SearchPage() {
   const [filters, setFilters] = useState(null);
   const [formError, setFormError] = useState(null);
 
-  const { data: results, isPending, isFetching, isError, error } = useQuery({
+  const {
+    data: results,
+    isPending,
+    isFetching,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['search', workspaceId, filters],
     queryFn: () => searchApi.messages(workspaceId, filters),
     enabled: Boolean(filters),
@@ -150,7 +156,11 @@ export default function SearchPage() {
       {loading && <SkeletonList rows={3} label="Searching" />}
 
       {!filters && (
-        <EmptyState icon={Search} title="Search your messages" description="Type a word or choose a filter, then search." />
+        <EmptyState
+          icon={Search}
+          title="Search your messages"
+          description="Type a word or choose a filter, then search."
+        />
       )}
 
       {filters && !loading && results && results.length === 0 && (
@@ -163,7 +173,9 @@ export default function SearchPage() {
             <li key={result.id}>
               <button
                 type="button"
-                onClick={() => navigate(pathFor(workspaceId, result.roomId) + '?message=' + encodeURIComponent(result.id))}
+                onClick={() =>
+                  navigate(pathFor(workspaceId, result.roomId) + '?message=' + encodeURIComponent(result.id))
+                }
                 className="w-full rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-brand-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-brand-500/40"
               >
                 <div className="flex flex-wrap items-baseline gap-2 text-xs text-slate-500 dark:text-slate-400">

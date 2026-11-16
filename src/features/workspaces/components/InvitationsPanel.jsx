@@ -81,8 +81,8 @@ export default function InvitationsPanel({ workspaceId, role: myRole }) {
         Invite people
       </h2>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-        Create a link. Anyone who opens it while signed in can join with the role you choose. A link
-        can be used by many people and expires after 7 days.
+        Create a link. Anyone who opens it while signed in can join with the role you choose. A link can be
+        used by many people and expires after 7 days.
       </p>
 
       <form onSubmit={onCreate} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">

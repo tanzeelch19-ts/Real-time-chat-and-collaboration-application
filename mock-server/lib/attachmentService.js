@@ -14,7 +14,10 @@ export const ALLOWED_MIME_TYPES = [
   'text/plain',
 ];
 
-const UPLOAD_DIR = join(process.env.DATA_DIR || join(dirname(fileURLToPath(import.meta.url)), '..', 'data'), 'uploads');
+const UPLOAD_DIR = join(
+  process.env.DATA_DIR || join(dirname(fileURLToPath(import.meta.url)), '..', 'data'),
+  'uploads',
+);
 
 /** Headers sent by the browser are percent-encoded, so UTF-8 names survive. */
 export function decodeHeader(value) {
@@ -28,9 +31,16 @@ export function decodeHeader(value) {
 
 /** Keeps only the file name, drops path parts and characters that are unsafe in headers and disks. */
 export function sanitizeFilename(value) {
-  const base = String(value ?? '').split(/[\\/]/).pop() ?? '';
+  const base =
+    String(value ?? '')
+      .split(/[\\/]/)
+      .pop() ?? '';
   const unsafe = new Set(['<', '>', ':', '"', '|', '?', '*']);
-  const cleaned = [...base].filter((ch) => ch.charCodeAt(0) >= 32 && !unsafe.has(ch)).join('').trim().slice(0, 120);
+  const cleaned = [...base]
+    .filter((ch) => ch.charCodeAt(0) >= 32 && !unsafe.has(ch))
+    .join('')
+    .trim()
+    .slice(0, 120);
   return cleaned || 'file';
 }
 

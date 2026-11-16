@@ -50,9 +50,7 @@ export function validateAvatarUrl(value) {
 
 /** Throws a 422 listing every failing field. Pass `null` for valid fields. */
 export function assertValid(checks) {
-  const details = Object.entries(checks).flatMap(([field, message]) =>
-    message ? [{ field, message }] : [],
-  );
+  const details = Object.entries(checks).flatMap(([field, message]) => (message ? [{ field, message }] : []));
   if (details.length > 0) {
     throw new ApiError(422, 'VALIDATION_ERROR', 'Please fix the highlighted fields.', details);
   }

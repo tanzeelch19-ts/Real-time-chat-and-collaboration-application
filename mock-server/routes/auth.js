@@ -5,12 +5,7 @@ import { ApiError } from '../lib/apiError.js';
 import { hashPassword, verifyPassword } from '../lib/password.js';
 import { toPublicUser } from '../lib/publicUser.js';
 import { createSession } from '../lib/session.js';
-import {
-  assertValid,
-  validateDisplayName,
-  validateEmail,
-  validatePassword,
-} from '../lib/validate.js';
+import { assertValid, validateDisplayName, validateEmail, validatePassword } from '../lib/validate.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
 const router = Router();
@@ -79,7 +74,9 @@ router.post('/forgot-password', (req, res) => {
     const resetToken = randomBytes(32).toString('hex');
     db.resetTokens.set(resetToken, { userId: user.id, expiresAt: Date.now() + RESET_TTL_MS });
     // Simulated email delivery: the link is printed to the dev server console only.
-    console.log(`[mock email] Reset link for ${user.email}: http://localhost:5173/reset-password?token=${resetToken}`);
+    console.log(
+      `[mock email] Reset link for ${user.email}: http://localhost:5173/reset-password?token=${resetToken}`,
+    );
   }
 
   res.status(202).json({ message: 'If an account exists for this email, a reset link has been sent.' });
@@ -91,12 +88,20 @@ router.post('/reset-password', async (req, res) => {
 
   const record = typeof token === 'string' ? db.resetTokens.get(token) : undefined;
   if (!record || record.expiresAt < Date.now()) {
-    throw new ApiError(400, 'INVALID_RESET_TOKEN', 'This reset link is invalid or has expired. Request a new one.');
+    throw new ApiError(
+      400,
+      'INVALID_RESET_TOKEN',
+      'This reset link is invalid or has expired. Request a new one.',
+    );
   }
 
   const user = db.users.find((candidate) => candidate.id === record.userId);
   if (!user) {
-    throw new ApiError(400, 'INVALID_RESET_TOKEN', 'This reset link is invalid or has expired. Request a new one.');
+    throw new ApiError(
+      400,
+      'INVALID_RESET_TOKEN',
+      'This reset link is invalid or has expired. Request a new one.',
+    );
   }
 
   user.passwordHash = await hashPassword(password);

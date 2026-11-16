@@ -8,7 +8,11 @@ import { useUpdateWorkspaceDetails } from '@/features/workspaces/useWorkspaceDet
 import { toSerializableError } from '@/services/api/errors';
 
 const detailsSchema = z.object({
-  name: z.string().trim().min(2, 'Name must be at least 2 characters').max(60, 'Name must be 60 characters or fewer'),
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Name must be at least 2 characters')
+    .max(60, 'Name must be 60 characters or fewer'),
   description: z.string().trim().max(500, 'Description must be 500 characters or fewer'),
   avatarUrl: z
     .string()
@@ -69,10 +73,14 @@ export default function WorkspaceDetailsPanel({ workspace, canEdit }) {
           </div>
           <div>
             <dt className="font-medium">Description</dt>
-            <dd className="whitespace-pre-wrap break-words">{workspace.description || 'No description yet.'}</dd>
+            <dd className="whitespace-pre-wrap break-words">
+              {workspace.description || 'No description yet.'}
+            </dd>
           </div>
         </dl>
-        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">Only the owner can change these details.</p>
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+          Only the owner can change these details.
+        </p>
       </section>
     );
   }
@@ -114,7 +122,11 @@ export default function WorkspaceDetailsPanel({ workspace, canEdit }) {
             {...register('description')}
           />
           {errors.description && (
-            <p id="workspaceDescription-error" role="alert" className="text-xs text-red-600 dark:text-red-400">
+            <p
+              id="workspaceDescription-error"
+              role="alert"
+              className="text-xs text-red-600 dark:text-red-400"
+            >
               {errors.description.message}
             </p>
           )}

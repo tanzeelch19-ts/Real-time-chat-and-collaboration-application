@@ -41,7 +41,14 @@ function typingText(typers) {
  * Shared screen for channels and direct messages. Keeps the draft in Redux, shows upload
  * progress and retry, and scrolls to a message when the URL has ?message=<id> (from search).
  */
-export default function RoomView({ roomId, title, subtitle, canModerate = false, readOnly = false, headerActions = null }) {
+export default function RoomView({
+  roomId,
+  title,
+  subtitle,
+  canModerate = false,
+  readOnly = false,
+  headerActions = null,
+}) {
   const dispatch = useDispatch();
   const { workspaceId } = useParams();
   const [params] = useSearchParams();
@@ -84,7 +91,7 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
   const jumpToBottom = () => {
     nearBottomRef.current = true;
     setShowNew(false);
-    bottomRef.current?.scrollIntoView({ block: "end" });
+    bottomRef.current?.scrollIntoView({ block: 'end' });
   };
   const onScrollList = (event) => {
     const el = event.currentTarget;
@@ -116,7 +123,6 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
     };
   }, [roomId]);
 
-
   // Search result: load older pages until the message is on screen, then scroll to it once.
   useEffect(() => {
     if (!targetId || !data || handledTarget.current === targetId) return;
@@ -137,7 +143,8 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
   // Scroll to the newest message, unless a search target is still being found.
   useEffect(() => {
     if (targetId && handledTarget.current !== targetId) return;
-    if (nearBottomRef.current) bottomRef.current?.scrollIntoView({ block: 'end' }); else setShowNew(true);
+    if (nearBottomRef.current) bottomRef.current?.scrollIntoView({ block: 'end' });
+    else setShowNew(true);
   }, [messageCount, targetId]);
 
   // Opening the room, or seeing new messages in it, clears its notifications.
@@ -159,7 +166,9 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
     const body = text.trim();
     if (!body) return;
     send(body);
-    dispatch(clearDraft(roomId)); nearBottomRef.current = true; setShowNew(false);
+    dispatch(clearDraft(roomId));
+    nearBottomRef.current = true;
+    setShowNew(false);
     stopTyping();
   };
 
@@ -233,7 +242,11 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
           />
         )}
 
-        <div ref={scrollRef} onScroll={onScrollList} className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+        <div
+          ref={scrollRef}
+          onScroll={onScrollList}
+          className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6"
+        >
           {isPending && <SkeletonList rows={4} label="Loading messages" />}
           {isError && <FormAlert>{toSerializableError(error).message}</FormAlert>}
 
@@ -251,7 +264,9 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
                 </div>
               )}
               <MessageList
-                messages={data.messages} openedAt={openedAt} memberNames={memberNameMap}
+                messages={data.messages}
+                openedAt={openedAt}
+                memberNames={memberNameMap}
                 currentUserId={user?.id}
                 canModerate={canModerate}
                 mentionNames={mentionNames}
@@ -270,18 +285,28 @@ export default function RoomView({ roomId, title, subtitle, canModerate = false,
         </div>
 
         {showNew && (
-  <div className="flex justify-center px-4 pb-2 sm:px-6">
-    <Button className="h-8 px-3" onClick={jumpToBottom}>New messages</Button>
-  </div>
-)}
-<p aria-live="polite" className="h-5 shrink-0 px-4 text-xs text-slate-500 dark:text-slate-400 sm:px-6">
+          <div className="flex justify-center px-4 pb-2 sm:px-6">
+            <Button className="h-8 px-3" onClick={jumpToBottom}>
+              New messages
+            </Button>
+          </div>
+        )}
+        <p
+          aria-live="polite"
+          className="h-5 shrink-0 px-4 text-xs text-slate-500 dark:text-slate-400 sm:px-6"
+        >
           {typingText(typers)}
         </p>
 
         {failedUpload && (
           <div className="mx-4 mb-2 flex flex-wrap items-center gap-2 sm:mx-6">
             <FormAlert className="flex-1">{upload.error?.message ?? 'Upload failed.'}</FormAlert>
-            <Button variant="secondary" className="h-8 px-3" onClick={retryUpload} disabled={upload.isPending}>
+            <Button
+              variant="secondary"
+              className="h-8 px-3"
+              onClick={retryUpload}
+              disabled={upload.isPending}
+            >
               <RotateCw size={14} aria-hidden="true" />
               Retry upload
             </Button>

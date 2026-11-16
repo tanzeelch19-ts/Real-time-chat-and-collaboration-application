@@ -42,7 +42,13 @@ export default function NotificationToast() {
         for (const n of list) {
           if (seen.current.has(n.id)) continue;
           seen.current.add(n.id);
-          if (!n.readAt) show({ id: n.id, actor: n.actor?.displayName ?? 'Someone', kind: n.kind, preview: n.preview ?? '' });
+          if (!n.readAt)
+            show({
+              id: n.id,
+              actor: n.actor?.displayName ?? 'Someone',
+              kind: n.kind,
+              preview: n.preview ?? '',
+            });
         }
       } catch {
         // Next tick tries again.
@@ -87,7 +93,13 @@ export default function NotificationToast() {
             </p>
             <p className="truncate text-slate-500 dark:text-slate-400">{t.preview}</p>
           </div>
-          <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Dismiss notification" onClick={() => dismiss(t.id)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            aria-label="Dismiss notification"
+            onClick={() => dismiss(t.id)}
+          >
             <X size={14} aria-hidden="true" />
           </Button>
         </div>

@@ -11,7 +11,15 @@ describe('message search filters', () => {
       { workspaceId: 'w1', userId: 'u2', role: 'member', joinedAt: now },
     ];
     db.channels = [
-      { id: 'c1', workspaceId: 'w1', name: 'general', visibility: 'public', createdBy: 'u1', createdAt: now, archivedAt: null },
+      {
+        id: 'c1',
+        workspaceId: 'w1',
+        name: 'general',
+        visibility: 'public',
+        createdBy: 'u1',
+        createdAt: now,
+        archivedAt: null,
+      },
     ];
     db.channelMembers = [];
     db.conversations = [];
@@ -19,8 +27,26 @@ describe('message search filters', () => {
     db.attachments = [];
     db.reactions = [];
     db.messages = [
-      { id: 'm1', roomId: 'channel:c1', threadId: null, authorId: 'u1', body: 'quarterly report draft', createdAt: '2026-06-01T10:00:00.000Z', editedAt: null, deletedAt: null },
-      { id: 'm2', roomId: 'channel:c1', threadId: null, authorId: 'u2', body: 'quarterly report final', createdAt: '2026-07-01T10:00:00.000Z', editedAt: null, deletedAt: null },
+      {
+        id: 'm1',
+        roomId: 'channel:c1',
+        threadId: null,
+        authorId: 'u1',
+        body: 'quarterly report draft',
+        createdAt: '2026-06-01T10:00:00.000Z',
+        editedAt: null,
+        deletedAt: null,
+      },
+      {
+        id: 'm2',
+        roomId: 'channel:c1',
+        threadId: null,
+        authorId: 'u2',
+        body: 'quarterly report final',
+        createdAt: '2026-07-01T10:00:00.000Z',
+        editedAt: null,
+        deletedAt: null,
+      },
     ];
   });
 

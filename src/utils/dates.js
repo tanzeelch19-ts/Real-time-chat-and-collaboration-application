@@ -13,5 +13,10 @@ export function dayLabel(iso, now = new Date()) {
   yesterday.setDate(now.getDate() - 1);
   if (sameDay(date, now)) return 'Today';
   if (sameDay(date, yesterday)) return 'Yesterday';
-  return date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }

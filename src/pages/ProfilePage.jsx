@@ -116,7 +116,12 @@ export default function ProfilePage() {
             tabIndex={-1}
             onChange={onAvatarPicked}
           />
-          <Button variant="secondary" className="h-8 px-3" onClick={() => fileRef.current?.click()} disabled={avatarBusy}>
+          <Button
+            variant="secondary"
+            className="h-8 px-3"
+            onClick={() => fileRef.current?.click()}
+            disabled={avatarBusy}
+          >
             <Camera size={14} aria-hidden="true" />
             {avatarBusy ? 'Uploading...' : 'Upload photo'}
           </Button>

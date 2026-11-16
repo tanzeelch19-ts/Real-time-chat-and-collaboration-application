@@ -1,11 +1,18 @@
-  import { Server } from 'socket.io';
+import { Server } from 'socket.io';
 import { db } from '../data/store.js';
 import { deleteMessage, editMessage, sendMessage, toggleReaction } from '../lib/messageActions.js';
 import { saveDb } from '../lib/persist.js';
 import { resolveRoomAccess } from '../lib/rooms.js';
 import { getSession } from '../lib/session.js';
 import { setIo } from '../realtime/hub.js';
-import { awayUserIds, markConnected, markDisconnected, onlineUserIds, startAwaySweep, touchActivity } from './presence.js';
+import {
+  awayUserIds,
+  markConnected,
+  markDisconnected,
+  onlineUserIds,
+  startAwaySweep,
+  touchActivity,
+} from './presence.js';
 
 function reply(ack, payload) {
   if (typeof ack === 'function') ack(payload);

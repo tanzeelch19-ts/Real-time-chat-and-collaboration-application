@@ -8,10 +8,23 @@ const DATA_DIR = process.env.DATA_DIR || join(dirname(fileURLToPath(import.meta.
 const FILE = join(DATA_DIR, 'db.json');
 
 const LIST_KEYS = [
-  'users', 'workspaces', 'memberships', 'channels', 'channelMembers',
-  'conversations', 'conversationMembers', 'messages', 'reactions',
-  'attachments', 'notifications', 'audit', 'pins', 'savedMessages', 'meetings',
-  'reads', 'mutes',
+  'users',
+  'workspaces',
+  'memberships',
+  'channels',
+  'channelMembers',
+  'conversations',
+  'conversationMembers',
+  'messages',
+  'reactions',
+  'attachments',
+  'notifications',
+  'audit',
+  'pins',
+  'savedMessages',
+  'meetings',
+  'reads',
+  'mutes',
 ];
 const MAP_KEYS = ['sessions', 'resetTokens', 'invitations'];
 

@@ -6,11 +6,7 @@ import { createNotification } from '../lib/notificationService.js';
 import { isAdminOrAbove } from '../lib/permissions.js';
 import { isMuted } from '../lib/roomSettings.js';
 import { assertValid } from '../lib/validate.js';
-import {
-  validateChannelName,
-  validateUserId,
-  validateVisibility,
-} from '../lib/validateWorkspace.js';
+import { validateChannelName, validateUserId, validateVisibility } from '../lib/validateWorkspace.js';
 import { requireMembership, requirePermission } from '../lib/workspaceAccess.js';
 import {
   addChannelMember,
@@ -62,38 +58,31 @@ router.get('/:workspaceId/channels', requireMembership, (req, res) => {
   res.json({ channels });
 });
 
-router.post(
-  '/:workspaceId/channels',
-  requireMembership,
-  requirePermission('channels:create'),
-  (req, res) => {
-    const { name, visibility = 'public' } = req.body ?? {};
-    assertValid({
-      name: validateChannelName(name),
-      visibility: validateVisibility(visibility),
-    });
+router.post('/:workspaceId/channels', requireMembership, requirePermission('channels:create'), (req, res) => {
+  const { name, visibility = 'public' } = req.body ?? {};
+  assertValid({
+    name: validateChannelName(name),
+    visibility: validateVisibility(visibility),
+  });
 
-    const normalized = name.trim().toLowerCase();
-    const duplicate = db.channels.some(
-      (c) => c.workspaceId === req.workspace.id && c.name === normalized,
-    );
-    if (duplicate) {
-      throw new ApiError(409, 'CONFLICT', 'A channel with this name already exists.', [
-        { field: 'name', message: 'A channel with this name already exists.' },
-      ]);
-    }
+  const normalized = name.trim().toLowerCase();
+  const duplicate = db.channels.some((c) => c.workspaceId === req.workspace.id && c.name === normalized);
+  if (duplicate) {
+    throw new ApiError(409, 'CONFLICT', 'A channel with this name already exists.', [
+      { field: 'name', message: 'A channel with this name already exists.' },
+    ]);
+  }
 
-    const channel = createChannel({
-      workspaceId: req.workspace.id,
-      name: normalized,
-      visibility,
-      creatorId: req.user.id,
-    });
-    if (visibility === 'private') addChannelMember(channel.id, req.user.id);
+  const channel = createChannel({
+    workspaceId: req.workspace.id,
+    name: normalized,
+    visibility,
+    creatorId: req.user.id,
+  });
+  if (visibility === 'private') addChannelMember(channel.id, req.user.id);
 
-    res.status(201).json({ channel: toChannelView(channel) });
-  },
-);
+  res.status(201).json({ channel: toChannelView(channel) });
+});
 
 router.get('/:workspaceId/channels/:channelId', requireMembership, (req, res) => {
   res.json({ channel: toChannelView(findVisibleChannel(req)) });
@@ -154,10 +143,7 @@ router.delete('/:workspaceId/channels/:channelId/members/:userId', requireMember
   if (!isSelf && !canManageChannel(channel, req.membership.role, req.user.id)) {
     throw new ApiError(403, 'FORBIDDEN', 'Only the channel creator or an admin can remove members.');
   }
-  removeWhere(
-    db.channelMembers,
-    (cm) => cm.channelId === channel.id && cm.userId === req.params.userId,
-  );
+  removeWhere(db.channelMembers, (cm) => cm.channelId === channel.id && cm.userId === req.params.userId);
   res.status(204).end();
 });
 

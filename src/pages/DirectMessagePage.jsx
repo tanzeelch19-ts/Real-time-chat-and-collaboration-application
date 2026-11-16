@@ -12,9 +12,7 @@ export default function DirectMessagePage() {
       key={conversationId}
       roomId={`conversation:${conversationId}`}
       title={conversation?.name ?? 'Direct message'}
-      subtitle={
-        conversation?.kind === 'group' ? `${conversation.members.length} people` : undefined
-      }
+      subtitle={conversation?.kind === 'group' ? `${conversation.members.length} people` : undefined}
     />
   );
 }

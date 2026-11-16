@@ -29,7 +29,11 @@ describe('LoginPage', () => {
   it('shows the server error when the credentials are wrong', async () => {
     const user = userEvent.setup();
     authApi.login.mockRejectedValue(
-      new ApiClientError({ status: 401, code: 'INVALID_CREDENTIALS', message: 'Email or password is incorrect.' }),
+      new ApiClientError({
+        status: 401,
+        code: 'INVALID_CREDENTIALS',
+        message: 'Email or password is incorrect.',
+      }),
     );
     renderWithProviders(<LoginPage />);
 

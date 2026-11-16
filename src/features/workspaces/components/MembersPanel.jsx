@@ -8,11 +8,7 @@ import { SkeletonList } from '@/components/common/Skeleton';
 import FormAlert from '@/components/forms/FormAlert';
 import { useAuth } from '@/features/auth/useAuth';
 import { canChangeMemberRole, canRemoveMember } from '@/features/workspaces/permissions';
-import {
-  useChangeMemberRole,
-  useMembers,
-  useRemoveMember,
-} from '@/features/workspaces/useWorkspaces';
+import { useChangeMemberRole, useMembers, useRemoveMember } from '@/features/workspaces/useWorkspaces';
 import { toSerializableError } from '@/services/api/errors';
 
 const ROLE_LABELS = { owner: 'Owner', admin: 'Admin', member: 'Member', guest: 'Guest' };
@@ -33,8 +29,7 @@ export default function MembersPanel({ workspaceId, role: myRole }) {
   const [pendingRemove, setPendingRemove] = useState(null);
 
   const sorted = [...(members ?? [])].sort(
-    (a, b) =>
-      ROLE_ORDER[a.role] - ROLE_ORDER[b.role] || a.displayName.localeCompare(b.displayName),
+    (a, b) => ROLE_ORDER[a.role] - ROLE_ORDER[b.role] || a.displayName.localeCompare(b.displayName),
   );
 
   const onRoleChange = async (member, newRole) => {

@@ -15,8 +15,12 @@ export function errorHandler(err, _req, res, _next) {
     return res.status(400).json({ error: { code: 'BAD_JSON', message: 'Request body is not valid JSON.' } });
   }
   if (err.type === 'entity.too.large') {
-    return res.status(413).json({ error: { code: 'PAYLOAD_TOO_LARGE', message: 'Request body is too large.' } });
+    return res
+      .status(413)
+      .json({ error: { code: 'PAYLOAD_TOO_LARGE', message: 'Request body is too large.' } });
   }
   console.error(err);
-  return res.status(500).json({ error: { code: 'INTERNAL', message: 'Something went wrong on the server.' } });
+  return res
+    .status(500)
+    .json({ error: { code: 'INTERNAL', message: 'Something went wrong on the server.' } });
 }

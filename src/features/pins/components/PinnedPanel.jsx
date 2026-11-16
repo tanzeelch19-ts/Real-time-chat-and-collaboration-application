@@ -33,7 +33,9 @@ export default function PinnedPanel({ roomId, onClose }) {
         <ul className="space-y-2">
           {data.map((message) => (
             <li key={message.id} className="rounded-lg bg-white p-2 text-sm dark:bg-slate-950">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{message.author.displayName}</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                {message.author.displayName}
+              </p>
               <p className="whitespace-pre-wrap break-words">{message.body}</p>
             </li>
           ))}

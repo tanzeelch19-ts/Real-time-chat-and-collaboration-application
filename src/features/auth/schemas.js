@@ -62,6 +62,9 @@ export const profileSchema = z.object({
   avatarUrl: z
     .string()
     .trim()
-    .refine((value) => value.startsWith('data:image/') || value.length <= 500, 'URL must be 500 characters or fewer')
+    .refine(
+      (value) => value.startsWith('data:image/') || value.length <= 500,
+      'URL must be 500 characters or fewer',
+    )
     .refine(isAllowedAvatar, 'Enter a valid http or https URL'),
 });

@@ -10,7 +10,11 @@ describe('day labels', () => {
   });
 
   it('compares local calendar days', () => {
-    expect(sameLocalDay(new Date(2026, 10, 14, 1).toISOString(), new Date(2026, 10, 14, 23).toISOString())).toBe(true);
-    expect(sameLocalDay(new Date(2026, 10, 13, 23).toISOString(), new Date(2026, 10, 14, 1).toISOString())).toBe(false);
+    expect(
+      sameLocalDay(new Date(2026, 10, 14, 1).toISOString(), new Date(2026, 10, 14, 23).toISOString()),
+    ).toBe(true);
+    expect(
+      sameLocalDay(new Date(2026, 10, 13, 23).toISOString(), new Date(2026, 10, 14, 1).toISOString()),
+    ).toBe(false);
   });
 });

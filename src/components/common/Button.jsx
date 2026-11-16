@@ -16,13 +16,7 @@ const sizes = {
 /**
  * Base button. Defaults to type="button" so it never submits a form by accident.
  */
-export default function Button({
-  variant = 'primary',
-  size = 'md',
-  className,
-  type = 'button',
-  ...props
-}) {
+export default function Button({ variant = 'primary', size = 'md', className, type = 'button', ...props }) {
   return (
     <button
       type={type}

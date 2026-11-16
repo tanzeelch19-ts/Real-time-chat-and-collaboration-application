@@ -2,11 +2,7 @@ import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MembersPanel from '@/features/workspaces/components/MembersPanel';
 import { useAuth } from '@/features/auth/useAuth';
-import {
-  useChangeMemberRole,
-  useMembers,
-  useRemoveMember,
-} from '@/features/workspaces/useWorkspaces';
+import { useChangeMemberRole, useMembers, useRemoveMember } from '@/features/workspaces/useWorkspaces';
 import { renderWithProviders } from '@/test/renderWithProviders';
 
 vi.mock('@/features/auth/useAuth', () => ({ useAuth: vi.fn() }));

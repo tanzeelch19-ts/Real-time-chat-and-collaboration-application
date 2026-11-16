@@ -176,9 +176,14 @@ export default function MessageComposer({
       </div>
       {uploading && (
         <div className="mt-2" role="status" aria-live="polite">
-          <p className="text-xs text-slate-500 dark:text-slate-400">Uploading{uploadProgress !== null ? ' ' + uploadProgress + '%' : '...'}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Uploading{uploadProgress !== null ? ' ' + uploadProgress + '%' : '...'}
+          </p>
           <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-            <div className="h-full bg-brand-600 transition-all" style={{ width: (uploadProgress ?? 0) + '%' }} />
+            <div
+              className="h-full bg-brand-600 transition-all"
+              style={{ width: (uploadProgress ?? 0) + '%' }}
+            />
           </div>
         </div>
       )}

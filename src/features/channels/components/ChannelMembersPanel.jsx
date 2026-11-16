@@ -18,7 +18,14 @@ import { toSerializableError } from '@/services/api/errors';
  * Who is in a channel, with join, add, and remove. Public channels are readable by the whole
  * workspace, so this list shows the people who joined or were added explicitly.
  */
-export default function ChannelMembersPanel({ workspaceId, channel, workspaceMembers, myRole, myId, onClose }) {
+export default function ChannelMembersPanel({
+  workspaceId,
+  channel,
+  workspaceMembers,
+  myRole,
+  myId,
+  onClose,
+}) {
   const members = useChannelMembers(workspaceId, channel.id);
   const addMember = useAddChannelMember(workspaceId);
   const removeMember = useRemoveChannelMember(workspaceId, channel.id);
@@ -102,7 +109,12 @@ export default function ChannelMembersPanel({ workspaceId, channel, workspaceMem
                 </option>
               ))}
             </select>
-            <Button type="submit" variant="secondary" className="h-9 px-3" disabled={!addId || addMember.isPending}>
+            <Button
+              type="submit"
+              variant="secondary"
+              className="h-9 px-3"
+              disabled={!addId || addMember.isPending}
+            >
               <UserPlus size={14} aria-hidden="true" />
               Add
             </Button>
@@ -147,7 +159,9 @@ export default function ChannelMembersPanel({ workspaceId, channel, workspaceMem
 
       <ConfirmationDialog
         open={Boolean(pendingRemove)}
-        title={leaving ? 'Leave this channel?' : `Remove ${pendingRemove?.displayName ?? ''} from this channel?`}
+        title={
+          leaving ? 'Leave this channel?' : `Remove ${pendingRemove?.displayName ?? ''} from this channel?`
+        }
         description={
           leaving
             ? 'You will stop appearing in this channel member list. Private channels will hide from you.'

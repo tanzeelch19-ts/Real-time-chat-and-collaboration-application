@@ -30,7 +30,8 @@ api.interceptors.response.use(
     if (typeof response.data === 'string' && response.data.trimStart().startsWith('<')) {
       throw new ApiClientError({
         code: 'NOT_API',
-        message: 'Cannot reach the server. The app is not connected to its backend. Check the VITE_API_URL setting and redeploy.',
+        message:
+          'Cannot reach the server. The app is not connected to its backend. Check the VITE_API_URL setting and redeploy.',
       });
     }
     return response;

@@ -116,9 +116,7 @@ export default function AttachmentPreview({ attachment }) {
         </div>
       )}
 
-      {open && imageUrl && (
-        <ImageLightbox src={imageUrl} alt={attachment.filename} onClose={close} />
-      )}
+      {open && imageUrl && <ImageLightbox src={imageUrl} alt={attachment.filename} onClose={close} />}
     </div>
   );
 }

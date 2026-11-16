@@ -56,7 +56,8 @@ export default function MessageItem({
   const canPin = Boolean(onTogglePin) && !deleted && !busy;
   const canSave = Boolean(onToggleSave) && !deleted && !busy;
   const canCopy = !deleted && !pending;
-  const showToolbar = !editing && (canReact || canReply || canEdit || canDelete || canPin || canSave || canCopy);
+  const showToolbar =
+    !editing && (canReact || canReply || canEdit || canDelete || canPin || canSave || canCopy);
   const showStatusRow = !grouped || pending || failed || isPinned || (message.editedAt && !deleted);
 
   const reactorNames = (ids) => ids.map((id) => memberNames[id] ?? 'Someone').join(', ');
@@ -287,7 +288,13 @@ export default function MessageItem({
             </Button>
           )}
           {canCopy && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Copy message" onClick={copyText}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              aria-label="Copy message"
+              onClick={copyText}
+            >
               {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
             </Button>
           )}
@@ -327,7 +334,13 @@ export default function MessageItem({
             </Button>
           )}
           {canEdit && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Edit this message" onClick={startEditing}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              aria-label="Edit this message"
+              onClick={startEditing}
+            >
               <Pencil size={14} aria-hidden="true" />
             </Button>
           )}

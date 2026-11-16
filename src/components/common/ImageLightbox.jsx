@@ -18,7 +18,12 @@ export default function ImageLightbox({ src, alt, onClose }) {
   }, [onClose]);
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={alt || 'Image preview'} className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={alt || 'Image preview'}
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+    >
       <div aria-hidden="true" className="absolute inset-0 bg-slate-950/80" onClick={onClose} />
       <div className="relative max-h-full max-w-full">
         <button

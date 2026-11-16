@@ -83,8 +83,7 @@ export function useSendMessage(roomId) {
 
     const onSaved = (message) =>
       queryClient.setQueryData(key, (data) => confirmPendingMessage(data, clientId, message));
-    const onFailed = () =>
-      queryClient.setQueryData(key, (data) => markPendingFailed(data, clientId));
+    const onFailed = () => queryClient.setQueryData(key, (data) => markPendingFailed(data, clientId));
 
     const socket = connectSocket();
     if (socket.connected) {

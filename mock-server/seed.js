@@ -1,12 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { db } from './data/store.js';
 import { hashPassword } from './lib/password.js';
-import {
-  addChannelMember,
-  addMembership,
-  createChannel,
-  createWorkspace,
-} from './lib/workspaceService.js';
+import { addChannelMember, addMembership, createChannel, createWorkspace } from './lib/workspaceService.js';
 
 export const SEED_PASSWORD = 'Password123!';
 
@@ -19,13 +14,37 @@ const SEED_USERS = [
 
 /** Demo history shown on every fresh start, so each role sees messages in #general. */
 const SEED_MESSAGES = [
-  { room: 'general', email: 'owner@demo.test', body: 'Welcome to Demo Workspace! This is #general, where everyone can read and post.' },
-  { room: 'general', email: 'admin@demo.test', body: 'Admins can moderate channels and manage invite links from Settings.' },
-  { room: 'general', email: 'member@demo.test', body: 'Members can create channels, reply in threads, and search messages.' },
-  { room: 'general', email: 'guest@demo.test', body: 'Hi everyone, I am a guest. I can read and post in the channels I was added to.' },
-  { room: 'general', email: 'owner@demo.test', body: 'Try it: type @ to mention someone, or open the bell for notifications.' },
+  {
+    room: 'general',
+    email: 'owner@demo.test',
+    body: 'Welcome to Demo Workspace! This is #general, where everyone can read and post.',
+  },
+  {
+    room: 'general',
+    email: 'admin@demo.test',
+    body: 'Admins can moderate channels and manage invite links from Settings.',
+  },
+  {
+    room: 'general',
+    email: 'member@demo.test',
+    body: 'Members can create channels, reply in threads, and search messages.',
+  },
+  {
+    room: 'general',
+    email: 'guest@demo.test',
+    body: 'Hi everyone, I am a guest. I can read and post in the channels I was added to.',
+  },
+  {
+    room: 'general',
+    email: 'owner@demo.test',
+    body: 'Try it: type @ to mention someone, or open the bell for notifications.',
+  },
   { room: 'random', email: 'member@demo.test', body: 'Random is public too. Share anything here.' },
-  { room: 'random', email: 'admin@demo.test', body: 'Pins, saved messages, and search filters are in the sidebar and the header.' },
+  {
+    room: 'random',
+    email: 'admin@demo.test',
+    body: 'Pins, saved messages, and search filters are in the sidebar and the header.',
+  },
 ];
 
 /** Creates the demo accounts and workspace once per server start. */
@@ -63,7 +82,12 @@ function seedWorkspace() {
   // Guests only see channels they were added to, so add the guest to #general.
   addChannelMember(general.id, guest);
 
-  const random = createChannel({ workspaceId: workspace.id, name: 'random', visibility: 'public', creatorId: owner });
+  const random = createChannel({
+    workspaceId: workspace.id,
+    name: 'random',
+    visibility: 'public',
+    creatorId: owner,
+  });
 
   const leadership = createChannel({
     workspaceId: workspace.id,

@@ -4,9 +4,7 @@ import { db } from '../data/store.js';
 const userById = (id) => db.users.find((u) => u.id === id);
 
 export function membersOf(conversationId) {
-  return db.conversationMembers
-    .filter((cm) => cm.conversationId === conversationId)
-    .map((cm) => cm.userId);
+  return db.conversationMembers.filter((cm) => cm.conversationId === conversationId).map((cm) => cm.userId);
 }
 
 function findDirect(workspaceId, a, b) {

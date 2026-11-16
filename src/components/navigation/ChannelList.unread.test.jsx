@@ -11,7 +11,13 @@ describe('ChannelList unread and archived state', () => {
     useChannels.mockReturnValue({
       data: [
         { id: 'c1', name: 'general', visibility: 'public', unreadCount: 3, archivedAt: null },
-        { id: 'c2', name: 'random', visibility: 'public', unreadCount: 0, archivedAt: '2026-01-01T00:00:00Z' },
+        {
+          id: 'c2',
+          name: 'random',
+          visibility: 'public',
+          unreadCount: 0,
+          archivedAt: '2026-01-01T00:00:00Z',
+        },
       ],
       isPending: false,
       isError: false,

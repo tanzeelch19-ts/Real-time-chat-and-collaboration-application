@@ -28,7 +28,7 @@ export function normalizeError(error) {
     const fallback =
       status >= 500
         ? 'The server is unavailable. Please try again shortly.'
-        : FALLBACK_MESSAGES[status] ?? 'Something went wrong.';
+        : (FALLBACK_MESSAGES[status] ?? 'Something went wrong.');
     return new ApiClientError({
       status,
       code: body.code ?? 'HTTP_ERROR',

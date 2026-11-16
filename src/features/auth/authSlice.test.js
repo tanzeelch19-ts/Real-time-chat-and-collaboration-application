@@ -35,7 +35,11 @@ describe('auth slice', () => {
 
   it('stores a serializable error when login fails', async () => {
     authApi.login.mockRejectedValue(
-      new ApiClientError({ status: 401, code: 'INVALID_CREDENTIALS', message: 'Email or password is incorrect.' }),
+      new ApiClientError({
+        status: 401,
+        code: 'INVALID_CREDENTIALS',
+        message: 'Email or password is incorrect.',
+      }),
     );
     const store = makeStore();
 

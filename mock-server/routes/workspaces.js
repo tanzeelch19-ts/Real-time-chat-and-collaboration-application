@@ -6,11 +6,7 @@ import { recordAudit } from '../lib/auditService.js';
 import { invitationStatus } from '../lib/invitationStatus.js';
 import { can } from '../lib/permissions.js';
 import { assertValid, validateAvatarUrl } from '../lib/validate.js';
-import {
-  validateInviteRole,
-  validateMemberRole,
-  validateWorkspaceName,
-} from '../lib/validateWorkspace.js';
+import { validateInviteRole, validateMemberRole, validateWorkspaceName } from '../lib/validateWorkspace.js';
 import { requireMembership, requirePermission } from '../lib/workspaceAccess.js';
 import {
   createWorkspace,
@@ -77,57 +73,45 @@ router.get('/:workspaceId', requireMembership, (req, res) => {
 });
 
 /** Owner only. Any of name, description, and avatarUrl can be sent on its own. */
-router.patch(
-  '/:workspaceId',
-  requireMembership,
-  requirePermission('workspace:update'),
-  (req, res) => {
-    const body = req.body ?? {};
-    assertValid({
-      name: body.name === undefined ? null : validateWorkspaceName(body.name),
-      description:
-        body.description === undefined || DESCRIPTION_OK(body.description)
-          ? null
-          : 'Description must be 500 characters or fewer.',
-      avatarUrl: body.avatarUrl === undefined ? null : validateAvatarUrl(body.avatarUrl),
-    });
+router.patch('/:workspaceId', requireMembership, requirePermission('workspace:update'), (req, res) => {
+  const body = req.body ?? {};
+  assertValid({
+    name: body.name === undefined ? null : validateWorkspaceName(body.name),
+    description:
+      body.description === undefined || DESCRIPTION_OK(body.description)
+        ? null
+        : 'Description must be 500 characters or fewer.',
+    avatarUrl: body.avatarUrl === undefined ? null : validateAvatarUrl(body.avatarUrl),
+  });
 
-    if (body.name !== undefined) req.workspace.name = body.name.trim();
-    if (body.description !== undefined) req.workspace.description = body.description.trim();
-    if (body.avatarUrl !== undefined) req.workspace.avatarUrl = body.avatarUrl.trim();
+  if (body.name !== undefined) req.workspace.name = body.name.trim();
+  if (body.description !== undefined) req.workspace.description = body.description.trim();
+  if (body.avatarUrl !== undefined) req.workspace.avatarUrl = body.avatarUrl.trim();
 
-    recordAudit({
-      workspaceId: req.workspace.id,
-      actorId: req.user.id,
-      action: 'workspace.update',
-      targetType: 'workspace',
-      targetId: req.workspace.id,
-      summary: 'Updated workspace details',
-    });
-    res.json({ workspace: workspaceView(req.workspace, req.membership.role) });
-  },
-);
+  recordAudit({
+    workspaceId: req.workspace.id,
+    actorId: req.user.id,
+    action: 'workspace.update',
+    targetType: 'workspace',
+    targetId: req.workspace.id,
+    summary: 'Updated workspace details',
+  });
+  res.json({ workspace: workspaceView(req.workspace, req.membership.role) });
+});
 
-router.delete(
-  '/:workspaceId',
-  requireMembership,
-  requirePermission('workspace:delete'),
-  (req, res) => {
-    const workspaceId = req.workspace.id;
-    const channelIds = db.channels
-      .filter((c) => c.workspaceId === workspaceId)
-      .map((c) => c.id);
+router.delete('/:workspaceId', requireMembership, requirePermission('workspace:delete'), (req, res) => {
+  const workspaceId = req.workspace.id;
+  const channelIds = db.channels.filter((c) => c.workspaceId === workspaceId).map((c) => c.id);
 
-    removeWhere(db.workspaces, (w) => w.id === workspaceId);
-    removeWhere(db.memberships, (m) => m.workspaceId === workspaceId);
-    removeWhere(db.channelMembers, (cm) => channelIds.includes(cm.channelId));
-    removeWhere(db.channels, (c) => c.workspaceId === workspaceId);
-    for (const [token, invite] of db.invitations) {
-      if (invite.workspaceId === workspaceId) db.invitations.delete(token);
-    }
-    res.status(204).end();
-  },
-);
+  removeWhere(db.workspaces, (w) => w.id === workspaceId);
+  removeWhere(db.memberships, (m) => m.workspaceId === workspaceId);
+  removeWhere(db.channelMembers, (cm) => channelIds.includes(cm.channelId));
+  removeWhere(db.channels, (c) => c.workspaceId === workspaceId);
+  for (const [token, invite] of db.invitations) {
+    if (invite.workspaceId === workspaceId) db.invitations.delete(token);
+  }
+  res.status(204).end();
+});
 
 // Members
 
@@ -189,9 +173,7 @@ router.delete('/:workspaceId/members/:userId', requireMembership, (req, res) => 
     }
   }
 
-  const channelIds = db.channels
-    .filter((c) => c.workspaceId === req.workspace.id)
-    .map((c) => c.id);
+  const channelIds = db.channels.filter((c) => c.workspaceId === req.workspace.id).map((c) => c.id);
   recordAudit({
     workspaceId: req.workspace.id,
     actorId: req.user.id,
@@ -201,10 +183,7 @@ router.delete('/:workspaceId/members/:userId', requireMembership, (req, res) => 
     summary: isSelf ? 'Left the workspace' : 'Removed a member',
   });
   removeWhere(db.memberships, (m) => m === target);
-  removeWhere(
-    db.channelMembers,
-    (cm) => cm.userId === target.userId && channelIds.includes(cm.channelId),
-  );
+  removeWhere(db.channelMembers, (cm) => cm.userId === target.userId && channelIds.includes(cm.channelId));
   res.status(204).end();
 });
 

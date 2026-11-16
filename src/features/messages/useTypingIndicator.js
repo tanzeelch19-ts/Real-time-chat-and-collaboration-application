@@ -30,7 +30,10 @@ export function useTypingIndicator(roomId) {
         return;
       }
       clearTimeout(timerMap.get(userId));
-      timerMap.set(userId, setTimeout(() => forget(userId), SHOW_FOR_MS));
+      timerMap.set(
+        userId,
+        setTimeout(() => forget(userId), SHOW_FOR_MS),
+      );
       setTypers((current) =>
         current.some((t) => t.userId === userId) ? current : [...current, { userId, displayName }],
       );

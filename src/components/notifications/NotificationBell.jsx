@@ -130,7 +130,11 @@ export default function NotificationBell() {
                         onClick={() => {
                           markRead.mutate(notification.id);
                           setOpen(false);
-                          navigate(notification.roomId ? pathFor(notification) : '/w/' + notification.workspaceId + '/settings');
+                          navigate(
+                            notification.roomId
+                              ? pathFor(notification)
+                              : '/w/' + notification.workspaceId + '/settings',
+                          );
                         }}
                         className={cn(
                           'flex w-full gap-3 px-4 py-3 text-left hover:bg-slate-100 dark:hover:bg-slate-800',

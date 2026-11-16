@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import reducer, { presenceChanged, presenceSnapshot, selectPresenceStatus } from '@/features/presence/presenceSlice';
+import reducer, {
+  presenceChanged,
+  presenceSnapshot,
+  selectPresenceStatus,
+} from '@/features/presence/presenceSlice';
 
 const statusOf = (state, userId) => selectPresenceStatus(userId)({ presence: state });
 
@@ -16,10 +20,7 @@ describe('presence slice', () => {
   });
 
   it('loads both lists from a snapshot', () => {
-    const state = reducer(
-      undefined,
-      presenceSnapshot({ userIds: ['u1', 'u2'], awayIds: ['u2'] }),
-    );
+    const state = reducer(undefined, presenceSnapshot({ userIds: ['u1', 'u2'], awayIds: ['u2'] }));
     expect(statusOf(state, 'u1')).toBe('online');
     expect(statusOf(state, 'u2')).toBe('away');
   });

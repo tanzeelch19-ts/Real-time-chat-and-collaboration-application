@@ -19,8 +19,24 @@ let url;
 beforeAll(async () => {
   const now = new Date().toISOString();
   db.users = [
-    { id: 'ua', displayName: 'Ayesha Owner', email: 'a@test.local', avatarUrl: '', statusMessage: '', passwordHash: 'x', createdAt: now },
-    { id: 'ub', displayName: 'Hira Member', email: 'b@test.local', avatarUrl: '', statusMessage: '', passwordHash: 'x', createdAt: now },
+    {
+      id: 'ua',
+      displayName: 'Ayesha Owner',
+      email: 'a@test.local',
+      avatarUrl: '',
+      statusMessage: '',
+      passwordHash: 'x',
+      createdAt: now,
+    },
+    {
+      id: 'ub',
+      displayName: 'Hira Member',
+      email: 'b@test.local',
+      avatarUrl: '',
+      statusMessage: '',
+      passwordHash: 'x',
+      createdAt: now,
+    },
   ];
   db.sessions = new Map([
     [TOKEN_A, { userId: 'ua', expiresAt: FUTURE }],
@@ -32,7 +48,15 @@ beforeAll(async () => {
     { workspaceId: 'w1', userId: 'ub', role: 'member', joinedAt: now },
   ];
   db.channels = [
-    { id: 'c1', workspaceId: 'w1', name: 'general', visibility: 'public', createdBy: 'ua', createdAt: now, archivedAt: null },
+    {
+      id: 'c1',
+      workspaceId: 'w1',
+      name: 'general',
+      visibility: 'public',
+      createdBy: 'ua',
+      createdAt: now,
+      archivedAt: null,
+    },
   ];
   db.channelMembers = [];
   db.messages = [];

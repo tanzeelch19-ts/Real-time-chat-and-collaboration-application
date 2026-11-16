@@ -10,11 +10,11 @@ import '@/styles/index.css';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-    <AppProviders>
-      <Suspense fallback={<PageLoader label="Loading page" />}>
-        <RouterProvider router={router} />
-      </Suspense>
-    </AppProviders>
+      <AppProviders>
+        <Suspense fallback={<PageLoader label="Loading page" />}>
+          <RouterProvider router={router} />
+        </Suspense>
+      </AppProviders>
     </ErrorBoundary>
   </StrictMode>,
 );

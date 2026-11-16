@@ -51,7 +51,9 @@ export default function NotificationsPage() {
 
   const open = (notification) => {
     if (!notification.readAt) markRead.mutate(notification.id);
-    navigate(notification.roomId ? pathFor(workspaceId, notification.roomId) : '/w/' + workspaceId + '/settings');
+    navigate(
+      notification.roomId ? pathFor(workspaceId, notification.roomId) : '/w/' + workspaceId + '/settings',
+    );
   };
 
   return (

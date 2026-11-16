@@ -63,7 +63,9 @@ export default function SavedPage() {
                 className="w-full rounded-xl border border-slate-200 bg-white p-4 text-left transition-colors hover:border-brand-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-brand-500/40"
               >
                 <div className="flex flex-wrap items-baseline gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span className="font-medium text-slate-700 dark:text-slate-200">{titles.get(message.roomId)}</span>
+                  <span className="font-medium text-slate-700 dark:text-slate-200">
+                    {titles.get(message.roomId)}
+                  </span>
                   <span>{message.author.displayName}</span>
                   <time dateTime={message.createdAt}>{TIME.format(new Date(message.createdAt))}</time>
                 </div>

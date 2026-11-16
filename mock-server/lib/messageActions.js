@@ -73,8 +73,10 @@ export function sendMessage({ roomId, userId, body, threadId = null }) {
     }
   }
 
-  if (isArchivedRoom(roomId)) return fail(409, 'CONFLICT', 'This channel is archived. Nobody can post in it.');
-  if (isArchivedRoom(roomId)) return fail(409, 'CONFLICT', 'This channel is archived. Nobody can post in it.');
+  if (isArchivedRoom(roomId))
+    return fail(409, 'CONFLICT', 'This channel is archived. Nobody can post in it.');
+  if (isArchivedRoom(roomId))
+    return fail(409, 'CONFLICT', 'This channel is archived. Nobody can post in it.');
   const message = createMessage({ roomId, authorId: userId, body: body.trim(), threadId });
   notifyForMessage({
     roomId,
@@ -121,7 +123,15 @@ export function deleteMessage({ roomId, userId, messageId }) {
     return fail(403, 'FORBIDDEN', 'You cannot delete this message.');
   }
 
-  if (!isAuthor) recordAudit({ workspaceId: access.workspaceId, actorId: userId, action: 'message.delete', targetType: 'message', targetId: messageId, summary: 'Deleted a channel message' });
+  if (!isAuthor)
+    recordAudit({
+      workspaceId: access.workspaceId,
+      actorId: userId,
+      action: 'message.delete',
+      targetType: 'message',
+      targetId: messageId,
+      summary: 'Deleted a channel message',
+    });
   message.deletedAt = new Date().toISOString();
   message.body = '';
   removeReactions(message.id);

@@ -6,7 +6,7 @@ A team chat application built with React. Workspaces, public and private channel
 
 ## Getting started
 
-Requires Node.js 20.19 or newer.
+Requires Node.js 22.12 or newer (CI and the Dockerfile use Node 22).
 
 ```bash
 npm install
@@ -26,24 +26,24 @@ Open http://localhost:4000.
 
 All accounts use the password `Password123!`.
 
-| Email | Role |
-| --- | --- |
-| owner@demo.test | Owner |
-| admin@demo.test | Admin |
-| member@demo.test | Member |
-| guest@demo.test | Guest (sees #general only) |
+| Email            | Role                       |
+| ---------------- | -------------------------- |
+| owner@demo.test  | Owner                      |
+| admin@demo.test  | Admin                      |
+| member@demo.test | Member                     |
+| guest@demo.test  | Guest (sees #general only) |
 
 To test real-time updates, sign in with two accounts in two windows (one normal, one incognito).
 
 ## Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Development server with the mock API |
-| `npm run build` | Production build |
-| `npm test` | Unit and component tests |
+| Command            | Purpose                               |
+| ------------------ | ------------------------------------- |
+| `npm run dev`      | Development server with the mock API  |
+| `npm run build`    | Production build                      |
+| `npm test`         | Unit and component tests              |
 | `npm run test:e2e` | Two-session browser test (Playwright) |
-| `npm run lint` | Lint |
+| `npm run lint`     | Lint                                  |
 
 ## Tech stack
 

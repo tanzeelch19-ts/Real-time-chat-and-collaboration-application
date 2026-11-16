@@ -5,7 +5,10 @@ import { isGroupedWithPrevious } from '@/utils/grouping';
 
 function Divider({ label, tone = 'slate' }) {
   const line = tone === 'red' ? 'bg-red-300 dark:bg-red-500/40' : 'bg-slate-200 dark:bg-slate-800';
-  const text = tone === 'red' ? 'font-semibold text-red-600 dark:text-red-400' : 'font-medium text-slate-500 dark:text-slate-400';
+  const text =
+    tone === 'red'
+      ? 'font-semibold text-red-600 dark:text-red-400'
+      : 'font-medium text-slate-500 dark:text-slate-400';
   return (
     <li role="separator" className={cn('flex items-center gap-3 py-2 text-xs', text)}>
       <span className={cn('h-px flex-1', line)} />

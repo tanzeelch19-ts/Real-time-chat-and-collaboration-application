@@ -92,11 +92,7 @@ export default function WorkspaceSidebar({ open, onClose }) {
         </div>
       </aside>
 
-      <CreateChannelDialog
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        workspaceId={workspaceId}
-      />
+      <CreateChannelDialog open={createOpen} onClose={() => setCreateOpen(false)} workspaceId={workspaceId} />
     </>
   );
 }

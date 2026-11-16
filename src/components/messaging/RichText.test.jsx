@@ -9,6 +9,9 @@ describe('RichText', () => {
     );
     expect(container.querySelector('strong')).toHaveTextContent('team');
     expect(container.querySelector('code')).toHaveTextContent('npm run dev');
-    expect(screen.getByRole('link', { name: 'https://example.com' })).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(screen.getByRole('link', { name: 'https://example.com' })).toHaveAttribute(
+      'rel',
+      'noopener noreferrer',
+    );
   });
 });

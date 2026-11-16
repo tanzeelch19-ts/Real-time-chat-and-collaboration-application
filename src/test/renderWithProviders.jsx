@@ -17,7 +17,10 @@ export function makeTestStore(preloadedState) {
 /**
  * Renders a component with a fresh Redux store, a query client, and a memory router.
  */
-export function renderWithProviders(ui, { route = '/', preloadedState, store = makeTestStore(preloadedState) } = {}) {
+export function renderWithProviders(
+  ui,
+  { route = '/', preloadedState, store = makeTestStore(preloadedState) } = {},
+) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
