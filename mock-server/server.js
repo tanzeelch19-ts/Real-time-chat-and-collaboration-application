@@ -14,7 +14,8 @@ const api = createApp();
 
 const web = express();
 if (existsSync(DIST)) {
-  web.use(express.static(DIST));
+  // index: false, so the root page is answered by the app shell below and gets the no-cache header.
+  web.use(express.static(DIST, { index: false }));
   // Client-side routes (/login, /w/...) return the app shell.
   web.use((req, res, next) => {
     if (req.method !== 'GET') return next();
