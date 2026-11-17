@@ -18,7 +18,7 @@ const SearchPage = lazy(() => import('@/pages/SearchPage'));
 const SavedPage = lazy(() => import('@/pages/SavedPage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const WorkspaceSettingsPage = lazy(() => import('@/pages/WorkspaceSettingsPage'));
-const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage'));
+const WorkspaceHomePage = lazy(() => import('@/pages/WorkspaceHomePage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 /**
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
         path: '/w/:workspaceId',
         element: <AppShell />,
         children: [
-          { index: true, element: <PlaceholderPage title="Workspace home" /> },
+          { index: true, element: <WorkspaceHomePage /> },
           { path: 'channels/:channelId', element: <ChannelPage /> },
           { path: 'dm/:conversationId', element: <DirectMessagePage /> },
           { path: 'search', element: <SearchPage /> },
