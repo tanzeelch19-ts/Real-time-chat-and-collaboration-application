@@ -19,12 +19,17 @@ import { requireAuth } from '../middleware/requireAuth.js';
 
 const router = Router();
 
-/** With DEMO_MODE=true the public demo workspace cannot be deleted by a visitor. */
-function denyInDemo(_req, _res, next) {
-  if (process.env.DEMO_MODE === 'true') {
-    return next(new ApiError(403, 'FORBIDDEN', 'The demo workspace cannot be deleted.'));
-  }
-  return next();
+/**
+ * With DEMO_MODE=true, the seeded demo workspace is read-only for the action it guards.
+ * Workspaces that users create are not affected.
+ */
+export function denyInDemo(message) {
+  return (req, _res, next) => {
+    if (process.env.DEMO_MODE === 'true' && req.workspace?.isDemo) {
+      return next(new ApiError(403, 'FORBIDDEN', message));
+    }
+    return next();
+  };
 }
 router.use(requireAuth);
 
@@ -84,7 +89,7 @@ router.get('/:workspaceId', requireMembership, (req, res) => {
 router.patch(
   '/:workspaceId',
   requireMembership,
-  denyInDemo,
+  denyInDemo('The demo workspace name cannot be changed.'),
   requirePermission('workspace:update'),
   (req, res) => {
     const body = req.body ?? {};
@@ -116,7 +121,7 @@ router.patch(
 router.delete(
   '/:workspaceId',
   requireMembership,
-  denyInDemo,
+  denyInDemo('The demo workspace cannot be deleted.'),
   requirePermission('workspace:delete'),
   (req, res) => {
     const workspaceId = req.workspace.id;
@@ -139,73 +144,83 @@ router.get('/:workspaceId/members', requireMembership, (req, res) => {
   res.json({ members: listMembers(req.workspace.id) });
 });
 
-router.patch('/:workspaceId/members/:userId', requireMembership, denyInDemo, (req, res) => {
-  const { role } = req.body ?? {};
-  assertValid({ role: validateMemberRole(role) });
+router.patch(
+  '/:workspaceId/members/:userId',
+  requireMembership,
+  denyInDemo('Members of the demo workspace cannot be changed.'),
+  (req, res) => {
+    const { role } = req.body ?? {};
+    assertValid({ role: validateMemberRole(role) });
 
-  const actor = req.membership.role;
-  const target = getMembership(req.workspace.id, req.params.userId);
-  if (!target) throw new ApiError(404, 'NOT_FOUND', 'Member not found.');
-  if (target.userId === req.user.id) {
-    throw new ApiError(403, 'FORBIDDEN', 'You cannot change your own role.');
-  }
-  if (target.role === 'owner') {
-    throw new ApiError(403, 'FORBIDDEN', 'The owner role cannot be changed.');
-  }
-  if (!can(actor, 'members:changeRole')) {
-    throw new ApiError(403, 'FORBIDDEN', 'Your role does not allow this action.');
-  }
-  if (role === 'admin' && actor !== 'owner') {
-    throw new ApiError(403, 'FORBIDDEN', 'Only the owner can make someone an admin.');
-  }
-  if (actor === 'admin' && target.role === 'admin') {
-    throw new ApiError(403, 'FORBIDDEN', 'Admins cannot change other admins.');
-  }
-
-  target.role = role;
-  recordAudit({
-    workspaceId: req.workspace.id,
-    actorId: req.user.id,
-    action: 'member.role',
-    targetType: 'user',
-    targetId: target.userId,
-    summary: 'Changed a member role to ' + role,
-  });
-  res.json({ member: toMemberView(target) });
-});
-
-router.delete('/:workspaceId/members/:userId', requireMembership, denyInDemo, (req, res) => {
-  const target = getMembership(req.workspace.id, req.params.userId);
-  if (!target) throw new ApiError(404, 'NOT_FOUND', 'Member not found.');
-
-  const isSelf = target.userId === req.user.id;
-  const actor = req.membership.role;
-
-  if (target.role === 'owner') {
-    throw new ApiError(403, 'FORBIDDEN', 'The owner cannot leave or be removed.');
-  }
-  if (!isSelf) {
-    if (!can(actor, 'members:remove')) {
+    const actor = req.membership.role;
+    const target = getMembership(req.workspace.id, req.params.userId);
+    if (!target) throw new ApiError(404, 'NOT_FOUND', 'Member not found.');
+    if (target.userId === req.user.id) {
+      throw new ApiError(403, 'FORBIDDEN', 'You cannot change your own role.');
+    }
+    if (target.role === 'owner') {
+      throw new ApiError(403, 'FORBIDDEN', 'The owner role cannot be changed.');
+    }
+    if (!can(actor, 'members:changeRole')) {
       throw new ApiError(403, 'FORBIDDEN', 'Your role does not allow this action.');
     }
-    if (actor === 'admin' && target.role === 'admin') {
-      throw new ApiError(403, 'FORBIDDEN', 'Admins cannot remove other admins.');
+    if (role === 'admin' && actor !== 'owner') {
+      throw new ApiError(403, 'FORBIDDEN', 'Only the owner can make someone an admin.');
     }
-  }
+    if (actor === 'admin' && target.role === 'admin') {
+      throw new ApiError(403, 'FORBIDDEN', 'Admins cannot change other admins.');
+    }
 
-  const channelIds = db.channels.filter((c) => c.workspaceId === req.workspace.id).map((c) => c.id);
-  recordAudit({
-    workspaceId: req.workspace.id,
-    actorId: req.user.id,
-    action: 'member.remove',
-    targetType: 'user',
-    targetId: target.userId,
-    summary: isSelf ? 'Left the workspace' : 'Removed a member',
-  });
-  removeWhere(db.memberships, (m) => m === target);
-  removeWhere(db.channelMembers, (cm) => cm.userId === target.userId && channelIds.includes(cm.channelId));
-  res.status(204).end();
-});
+    target.role = role;
+    recordAudit({
+      workspaceId: req.workspace.id,
+      actorId: req.user.id,
+      action: 'member.role',
+      targetType: 'user',
+      targetId: target.userId,
+      summary: 'Changed a member role to ' + role,
+    });
+    res.json({ member: toMemberView(target) });
+  },
+);
+
+router.delete(
+  '/:workspaceId/members/:userId',
+  requireMembership,
+  denyInDemo('Members of the demo workspace cannot be changed.'),
+  (req, res) => {
+    const target = getMembership(req.workspace.id, req.params.userId);
+    if (!target) throw new ApiError(404, 'NOT_FOUND', 'Member not found.');
+
+    const isSelf = target.userId === req.user.id;
+    const actor = req.membership.role;
+
+    if (target.role === 'owner') {
+      throw new ApiError(403, 'FORBIDDEN', 'The owner cannot leave or be removed.');
+    }
+    if (!isSelf) {
+      if (!can(actor, 'members:remove')) {
+        throw new ApiError(403, 'FORBIDDEN', 'Your role does not allow this action.');
+      }
+      if (actor === 'admin' && target.role === 'admin') {
+        throw new ApiError(403, 'FORBIDDEN', 'Admins cannot remove other admins.');
+      }
+    }
+
+    const channelIds = db.channels.filter((c) => c.workspaceId === req.workspace.id).map((c) => c.id);
+    recordAudit({
+      workspaceId: req.workspace.id,
+      actorId: req.user.id,
+      action: 'member.remove',
+      targetType: 'user',
+      targetId: target.userId,
+      summary: isSelf ? 'Left the workspace' : 'Removed a member',
+    });
+    removeWhere(db.memberships, (m) => m === target);
+    removeWhere(db.channelMembers, (cm) => cm.userId === target.userId && channelIds.includes(cm.channelId));
+    res.status(204).end();
+  },
+);
 
 // Invitations (owner and admin)
 

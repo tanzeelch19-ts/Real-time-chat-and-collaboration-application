@@ -49,6 +49,11 @@ const SEED_MESSAGES = [
 
 /** Creates the demo accounts and workspace once per server start. */
 export async function seedUsers() {
+  // Data saved before the isDemo flag existed: mark the demo workspace so the guard applies to it.
+  const demoOwner = db.users.find((u) => u.email === 'owner@demo.test');
+  for (const w of db.workspaces) {
+    if (demoOwner && w.createdBy === demoOwner.id && w.name === 'Demo Workspace') w.isDemo = true;
+  }
   if (db.users.length > 0) return;
   const passwordHash = await hashPassword(SEED_PASSWORD);
   for (const seed of SEED_USERS) {
@@ -75,6 +80,7 @@ function seedWorkspace() {
   const guest = idOf('guest@demo.test');
 
   const { workspace, general } = createWorkspace({ name: 'Demo Workspace', creatorId: owner });
+  workspace.isDemo = true;
   addMembership(workspace.id, admin, 'admin');
   addMembership(workspace.id, member, 'member');
   addMembership(workspace.id, guest, 'guest');

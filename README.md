@@ -53,6 +53,10 @@ React 19, Vite, Tailwind CSS v4, React Router, Redux Toolkit, TanStack Query, Re
 
 The app runs as one Node service. The server provides the API, Socket.IO, and the built frontend on one port. Build with `npm install && npm run build`, and start with `node mock-server/server.js`. The included `Dockerfile` does the same.
 
+### Demo mode
+
+On a public deployment, set `DEMO_MODE=true`. The seeded Demo Workspace then cannot be renamed, deleted, or have its members changed, so visitors cannot break the demo for others. Workspaces created by users are not affected.
+
 ## Limitations
 
 - The backend is a documented mock. Data is saved to `mock-server/data/db.json` (or the folder set in `DATA_DIR`). On a host without a persistent volume, the data is lost when the container is redeployed.

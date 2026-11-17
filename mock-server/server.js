@@ -6,6 +6,7 @@ import express from 'express';
 import { createApp } from './app.js';
 import { seedUsers } from './seed.js';
 import { attachRealtime } from './socket/index.js';
+import { securityHeaders } from './lib/security.js';
 
 const PORT = Number(process.env.PORT) || 4000;
 const DIST = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
@@ -13,6 +14,7 @@ const DIST = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const api = createApp();
 
 const web = express();
+web.use(securityHeaders);
 if (existsSync(DIST)) {
   // index: false, so the root page is answered by the app shell below and gets the no-cache header.
   web.use(express.static(DIST, { index: false }));
