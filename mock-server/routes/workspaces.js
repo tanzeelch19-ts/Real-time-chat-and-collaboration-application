@@ -81,31 +81,37 @@ router.get('/:workspaceId', requireMembership, (req, res) => {
 });
 
 /** Owner only. Any of name, description, and avatarUrl can be sent on its own. */
-router.patch('/:workspaceId', requireMembership, requirePermission('workspace:update'), (req, res) => {
-  const body = req.body ?? {};
-  assertValid({
-    name: body.name === undefined ? null : validateWorkspaceName(body.name),
-    description:
-      body.description === undefined || DESCRIPTION_OK(body.description)
-        ? null
-        : 'Description must be 500 characters or fewer.',
-    avatarUrl: body.avatarUrl === undefined ? null : validateAvatarUrl(body.avatarUrl),
-  });
+router.patch(
+  '/:workspaceId',
+  requireMembership,
+  denyInDemo,
+  requirePermission('workspace:update'),
+  (req, res) => {
+    const body = req.body ?? {};
+    assertValid({
+      name: body.name === undefined ? null : validateWorkspaceName(body.name),
+      description:
+        body.description === undefined || DESCRIPTION_OK(body.description)
+          ? null
+          : 'Description must be 500 characters or fewer.',
+      avatarUrl: body.avatarUrl === undefined ? null : validateAvatarUrl(body.avatarUrl),
+    });
 
-  if (body.name !== undefined) req.workspace.name = body.name.trim();
-  if (body.description !== undefined) req.workspace.description = body.description.trim();
-  if (body.avatarUrl !== undefined) req.workspace.avatarUrl = body.avatarUrl.trim();
+    if (body.name !== undefined) req.workspace.name = body.name.trim();
+    if (body.description !== undefined) req.workspace.description = body.description.trim();
+    if (body.avatarUrl !== undefined) req.workspace.avatarUrl = body.avatarUrl.trim();
 
-  recordAudit({
-    workspaceId: req.workspace.id,
-    actorId: req.user.id,
-    action: 'workspace.update',
-    targetType: 'workspace',
-    targetId: req.workspace.id,
-    summary: 'Updated workspace details',
-  });
-  res.json({ workspace: workspaceView(req.workspace, req.membership.role) });
-});
+    recordAudit({
+      workspaceId: req.workspace.id,
+      actorId: req.user.id,
+      action: 'workspace.update',
+      targetType: 'workspace',
+      targetId: req.workspace.id,
+      summary: 'Updated workspace details',
+    });
+    res.json({ workspace: workspaceView(req.workspace, req.membership.role) });
+  },
+);
 
 router.delete(
   '/:workspaceId',
@@ -133,7 +139,7 @@ router.get('/:workspaceId/members', requireMembership, (req, res) => {
   res.json({ members: listMembers(req.workspace.id) });
 });
 
-router.patch('/:workspaceId/members/:userId', requireMembership, (req, res) => {
+router.patch('/:workspaceId/members/:userId', requireMembership, denyInDemo, (req, res) => {
   const { role } = req.body ?? {};
   assertValid({ role: validateMemberRole(role) });
 
@@ -168,7 +174,7 @@ router.patch('/:workspaceId/members/:userId', requireMembership, (req, res) => {
   res.json({ member: toMemberView(target) });
 });
 
-router.delete('/:workspaceId/members/:userId', requireMembership, (req, res) => {
+router.delete('/:workspaceId/members/:userId', requireMembership, denyInDemo, (req, res) => {
   const target = getMembership(req.workspace.id, req.params.userId);
   if (!target) throw new ApiError(404, 'NOT_FOUND', 'Member not found.');
 
