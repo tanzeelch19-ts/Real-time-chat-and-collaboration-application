@@ -204,13 +204,13 @@ export default function RoomView({
   return (
     <div className="relative flex h-full min-h-0 w-full">
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+        <header className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 px-6 py-4 dark:border-slate-800">
           <div className="min-w-0">
             <h1 className="truncate text-lg font-semibold">{title}</h1>
             {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
           </div>
           {headerActions}
-          <div className="flex shrink-0 gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
             <Button
               variant="secondary"
               className="h-8 px-3"

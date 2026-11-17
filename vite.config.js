@@ -29,6 +29,24 @@ function mockApi() {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), mockApi()],
+  build: {
+    rolldownOptions: {
+      output: {
+        // Vendor libraries are saved as separate files, so the app code is smaller and caches better.
+        manualChunks(id) {
+          const path = id.replace(/\\/g, '/');
+          if (!path.includes('/node_modules/')) return undefined;
+          if (/\/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(path))
+            return 'react';
+          if (/\/node_modules\/(@reduxjs|react-redux|redux|immer|reselect)\//.test(path)) return 'state';
+          if (/\/node_modules\/(@tanstack|axios)\//.test(path)) return 'data';
+          if (/\/node_modules\/(socket\.io-client|engine\.io-client|socket\.io-parser)\//.test(path))
+            return 'realtime';
+          return undefined;
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

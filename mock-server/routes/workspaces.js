@@ -18,6 +18,14 @@ import {
 import { requireAuth } from '../middleware/requireAuth.js';
 
 const router = Router();
+
+/** With DEMO_MODE=true the public demo workspace cannot be deleted by a visitor. */
+function denyInDemo(_req, _res, next) {
+  if (process.env.DEMO_MODE === 'true') {
+    return next(new ApiError(403, 'FORBIDDEN', 'The demo workspace cannot be deleted.'));
+  }
+  return next();
+}
 router.use(requireAuth);
 
 /** Workspace details: name plus the description and avatar link added for the workspace settings. */
@@ -99,19 +107,25 @@ router.patch('/:workspaceId', requireMembership, requirePermission('workspace:up
   res.json({ workspace: workspaceView(req.workspace, req.membership.role) });
 });
 
-router.delete('/:workspaceId', requireMembership, requirePermission('workspace:delete'), (req, res) => {
-  const workspaceId = req.workspace.id;
-  const channelIds = db.channels.filter((c) => c.workspaceId === workspaceId).map((c) => c.id);
+router.delete(
+  '/:workspaceId',
+  requireMembership,
+  denyInDemo,
+  requirePermission('workspace:delete'),
+  (req, res) => {
+    const workspaceId = req.workspace.id;
+    const channelIds = db.channels.filter((c) => c.workspaceId === workspaceId).map((c) => c.id);
 
-  removeWhere(db.workspaces, (w) => w.id === workspaceId);
-  removeWhere(db.memberships, (m) => m.workspaceId === workspaceId);
-  removeWhere(db.channelMembers, (cm) => channelIds.includes(cm.channelId));
-  removeWhere(db.channels, (c) => c.workspaceId === workspaceId);
-  for (const [token, invite] of db.invitations) {
-    if (invite.workspaceId === workspaceId) db.invitations.delete(token);
-  }
-  res.status(204).end();
-});
+    removeWhere(db.workspaces, (w) => w.id === workspaceId);
+    removeWhere(db.memberships, (m) => m.workspaceId === workspaceId);
+    removeWhere(db.channelMembers, (cm) => channelIds.includes(cm.channelId));
+    removeWhere(db.channels, (c) => c.workspaceId === workspaceId);
+    for (const [token, invite] of db.invitations) {
+      if (invite.workspaceId === workspaceId) db.invitations.delete(token);
+    }
+    res.status(204).end();
+  },
+);
 
 // Members
 

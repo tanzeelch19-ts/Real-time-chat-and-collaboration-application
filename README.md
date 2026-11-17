@@ -55,7 +55,7 @@ The app runs as one Node service. The server provides the API, Socket.IO, and th
 
 ## Limitations
 
-- The backend is a documented mock. Data lives in memory and in `mock-server/data/db.json`, and resets on restart.
+- The backend is a documented mock. Data is saved to `mock-server/data/db.json` (or the folder set in `DATA_DIR`). On a host without a persistent volume, the data is lost when the container is redeployed.
 - No email is sent. Reset and invite links appear in the server log.
 - Read and delivery receipts are not implemented.
 - Meetings have a start and end flow, but no video provider is connected.
