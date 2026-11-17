@@ -18,6 +18,7 @@ if (existsSync(DIST)) {
   // Client-side routes (/login, /w/...) return the app shell.
   web.use((req, res, next) => {
     if (req.method !== 'GET') return next();
+    res.setHeader('Cache-Control', 'no-cache');
     return res.sendFile(join(DIST, 'index.html'));
   });
 }

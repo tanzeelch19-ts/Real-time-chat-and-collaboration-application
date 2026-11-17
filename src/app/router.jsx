@@ -1,25 +1,25 @@
-import { lazy } from 'react';
+import { lazyWithReload } from '@/app/lazyRoute';
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '@/components/layout/AppShell';
 import RequireAuth from '@/features/auth/RequireAuth';
 
 // Pages load on demand, so the first screen does not download the whole app.
-const LoginPage = lazy(() => import('@/pages/LoginPage'));
-const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
-const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
-const WorkspaceSelectorPage = lazy(() => import('@/pages/WorkspaceSelectorPage'));
-const InvitationPage = lazy(() => import('@/pages/InvitationPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
-const PreferencesPage = lazy(() => import('@/pages/PreferencesPage'));
-const ChannelPage = lazy(() => import('@/pages/ChannelPage'));
-const DirectMessagePage = lazy(() => import('@/pages/DirectMessagePage'));
-const SearchPage = lazy(() => import('@/pages/SearchPage'));
-const SavedPage = lazy(() => import('@/pages/SavedPage'));
-const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
-const WorkspaceSettingsPage = lazy(() => import('@/pages/WorkspaceSettingsPage'));
-const WorkspaceHomePage = lazy(() => import('@/pages/WorkspaceHomePage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const LoginPage = lazyWithReload(() => import('@/pages/LoginPage'));
+const RegisterPage = lazyWithReload(() => import('@/pages/RegisterPage'));
+const ForgotPasswordPage = lazyWithReload(() => import('@/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazyWithReload(() => import('@/pages/ResetPasswordPage'));
+const WorkspaceSelectorPage = lazyWithReload(() => import('@/pages/WorkspaceSelectorPage'));
+const InvitationPage = lazyWithReload(() => import('@/pages/InvitationPage'));
+const ProfilePage = lazyWithReload(() => import('@/pages/ProfilePage'));
+const PreferencesPage = lazyWithReload(() => import('@/pages/PreferencesPage'));
+const ChannelPage = lazyWithReload(() => import('@/pages/ChannelPage'));
+const DirectMessagePage = lazyWithReload(() => import('@/pages/DirectMessagePage'));
+const SearchPage = lazyWithReload(() => import('@/pages/SearchPage'));
+const SavedPage = lazyWithReload(() => import('@/pages/SavedPage'));
+const NotificationsPage = lazyWithReload(() => import('@/pages/NotificationsPage'));
+const WorkspaceSettingsPage = lazyWithReload(() => import('@/pages/WorkspaceSettingsPage'));
+const WorkspaceHomePage = lazyWithReload(() => import('@/pages/WorkspaceHomePage'));
+const NotFoundPage = lazyWithReload(() => import('@/pages/NotFoundPage'));
 
 /**
  * Public routes are open. Everything under RequireAuth needs a valid session.
