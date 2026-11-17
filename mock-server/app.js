@@ -42,6 +42,13 @@ export function createApp() {
     next();
   });
   app.disable('x-powered-by');
+  // Live data must never be served from a cache. Without this, the browser can answer a
+  // conditional request with 304 and show an old copy, so new messages do not appear.
+  app.set('etag', false);
+  app.use('/api', (_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
   app.use(securityHeaders);
   app.use(requestLogger);
   app.use(express.json({ limit: '100kb' }));
