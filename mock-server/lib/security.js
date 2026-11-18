@@ -5,7 +5,7 @@ import rateLimit from 'express-rate-limit';
 export const securityHeaders = helmet({
   contentSecurityPolicy: {
     useDefaults: false,
-    reportOnly: true,
+    reportOnly: process.env.CSP_ENFORCE !== 'true',
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
