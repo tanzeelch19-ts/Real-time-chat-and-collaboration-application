@@ -59,6 +59,18 @@ export function createApp() {
     next();
   });
 
+  // Browsers send CSP violation reports here. They are written to the server log, so they can be read on Railway.
+  app.post(
+    '/api/csp-report',
+    express.json({
+      type: ['application/csp-report', 'application/reports+json', 'application/json'],
+      limit: '16kb',
+    }),
+    (req, res) => {
+      console.log(JSON.stringify({ time: new Date().toISOString(), cspViolation: req.body }));
+      res.status(204).end();
+    },
+  );
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
   app.use('/api/auth/login', authRateLimit);
   app.use('/api/auth/register', authRateLimit);

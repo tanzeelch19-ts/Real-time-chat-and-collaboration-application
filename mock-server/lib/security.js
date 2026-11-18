@@ -16,6 +16,7 @@ export const securityHeaders = helmet({
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       frameAncestors: ["'none'"],
+      reportUri: ['/api/csp-report'],
     },
   },
   crossOriginEmbedderPolicy: false,
