@@ -15,7 +15,13 @@ import auditRoutes from './routes/audit.js';
 import roomSettingsRoutes from './routes/roomSettings.js';
 import { errorHandler, notFound } from './middleware/errors.js';
 import { loadDb, saveDb } from './lib/persist.js';
-import { securityHeaders, authRateLimit, requestLogger } from './lib/security.js';
+import {
+  securityHeaders,
+  authRateLimit,
+  requestLogger,
+  cspReportRateLimit,
+  summarizeCspReport,
+} from './lib/security.js';
 
 /** Builds the mock API. Used by the Vite dev server. */
 export function createApp() {
@@ -59,18 +65,25 @@ export function createApp() {
     next();
   });
 
-  // Browsers send CSP violation reports here. They are written to the server log, so they can be read on Railway.
+  // Browsers send CSP violation reports here. Only three fields are logged, and requests are rate-limited.
   app.post(
     '/api/csp-report',
+    cspReportRateLimit,
     express.json({
       type: ['application/csp-report', 'application/reports+json', 'application/json'],
       limit: '16kb',
     }),
     (req, res) => {
-      console.log(JSON.stringify({ time: new Date().toISOString(), cspViolation: req.body }));
+      const items = Array.isArray(req.body) ? req.body.slice(0, 10) : [req.body];
+      for (const item of items) {
+        console.log(
+          JSON.stringify({ time: new Date().toISOString(), cspViolation: summarizeCspReport(item) }),
+        );
+      }
       res.status(204).end();
     },
   );
+
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
   app.use('/api/auth/login', authRateLimit);
   app.use('/api/auth/register', authRateLimit);

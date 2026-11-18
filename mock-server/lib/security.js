@@ -33,6 +33,27 @@ export const authRateLimit = rateLimit({
   },
 });
 
+/** Browsers can send many CSP reports. Limit them per IP so the log cannot be flooded. */
+export const cspReportRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: { code: 'RATE_LIMITED', message: 'Too many reports.' } },
+});
+
+const clip = (value) => (typeof value === 'string' ? value.slice(0, 200) : undefined);
+
+/** Keeps only the fields needed to find a violation: directive, blocked URL, and page URL. */
+export function summarizeCspReport(item) {
+  const r = item?.['csp-report'] ?? item?.body ?? item ?? {};
+  return {
+    violatedDirective: clip(r['violated-directive'] ?? r.effectiveDirective),
+    blockedUri: clip(r['blocked-uri'] ?? r.blockedURL),
+    documentUri: clip(r['document-uri'] ?? r.documentURL),
+  };
+}
+
 /** Writes one line per request: method, path, status, and duration. Never logs bodies or headers. */
 export function requestLogger(req, res, next) {
   const start = Date.now();
