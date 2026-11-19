@@ -35,6 +35,16 @@ describe('rate limits and X-Forwarded-For', () => {
     expect(limited).toBeGreaterThan(0);
   });
 
+  it.each(['0', 'false', 'true', 'abc'])(
+    'with TRUST_PROXY=%s, a fake X-Forwarded-For still cannot reset the login limit',
+    async (value) => {
+      process.env.TRUST_PROXY = value;
+      const app = createApp();
+      const limited = await bruteForce(app, (i) => ({ 'X-Forwarded-For': `10.8.${i}.1` }));
+      expect(limited).toBeGreaterThan(0);
+    },
+  );
+
   it('with TRUST_PROXY=1, each forwarded client gets its own bucket', async () => {
     process.env.TRUST_PROXY = '1';
     const app = createApp();

@@ -28,9 +28,11 @@ export function createApp() {
   loadDb();
 
   const app = express();
-  // Only when a reverse proxy sits in front of the server (Railway sets TRUST_PROXY=1). Otherwise a
+  // Only when a reverse proxy sits in front of the server (Railway: TRUST_PROXY=1). Otherwise a
   // client could send its own X-Forwarded-For and get a fresh rate-limit bucket on every request.
-  if (process.env.TRUST_PROXY) app.set('trust proxy', Number(process.env.TRUST_PROXY) || true);
+  // Only a positive number of proxy hops turns it on. 0, false or any other value leaves it off.
+  const proxyHops = Number.parseInt(process.env.TRUST_PROXY ?? '', 10);
+  if (Number.isInteger(proxyHops) && proxyHops > 0) app.set('trust proxy', proxyHops);
 
   // Cross-origin access for a frontend hosted elsewhere (for example Vercel).
   // Only origins listed in CORS_ORIGIN (comma-separated) are allowed. When it is empty,
