@@ -53,6 +53,10 @@ React 19, Vite, Tailwind CSS v4, React Router, Redux Toolkit, TanStack Query, Re
 
 The app runs as one Node service. The server provides the API, Socket.IO, and the built frontend on one port. Build with `npm install && npm run build`, and start with `node mock-server/server.js`. The included `Dockerfile` does the same.
 
+### Reverse proxy
+
+If the server runs behind a reverse proxy (Railway does), set `TRUST_PROXY=1`. The server then reads each client address from `X-Forwarded-For`, so rate limits apply per user. Leave it unset when the server is reached directly; otherwise a client can send any `X-Forwarded-For` and bypass the limits.
+
 ### Demo mode
 
 On a public deployment, set `DEMO_MODE=true`. The seeded Demo Workspace then cannot be renamed, deleted, or have its members changed, so visitors cannot break the demo for others. Workspaces created by users are not affected.
