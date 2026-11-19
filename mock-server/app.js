@@ -28,6 +28,8 @@ export function createApp() {
   loadDb();
 
   const app = express();
+  // Behind Railway's proxy, req.ip must come from X-Forwarded-For. Otherwise every user shares one rate-limit bucket.
+  app.set('trust proxy', 1);
 
   // Cross-origin access for a frontend hosted elsewhere (for example Vercel).
   // Only origins listed in CORS_ORIGIN (comma-separated) are allowed. When it is empty,
